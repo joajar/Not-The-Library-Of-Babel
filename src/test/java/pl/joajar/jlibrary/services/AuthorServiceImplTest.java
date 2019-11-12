@@ -35,6 +35,23 @@ public class AuthorServiceImplTest {
     }
 
     @Test
+    public void should_save_all_authors() {
+        //given
+        final Author Horstmann = Author.builder().firstName("Cay S.").lastName("Horstmann").build();
+        final Author Bloch = Author.builder().firstName("Joshua").lastName("Bloch").build();
+        final List<Author> authors;
+
+        //when
+        when(authorService.saveAll(Arrays.asList(Horstmann, Bloch))).thenReturn(Arrays.asList(Horstmann, Bloch));
+        authors = authorService.saveAll(Arrays.asList(Horstmann, Bloch));
+
+        //then
+        assertEquals(2, authors.size());
+        verify(authorRepository, times(1)).saveAll(anyList());
+        verifyNoMoreInteractions(authorRepository);
+    }
+
+    @Test
     public void should_find_all_authors() {
         //given
         final Author Horstmann = Author.builder().firstName("Cay S.").lastName("Horstmann").build();

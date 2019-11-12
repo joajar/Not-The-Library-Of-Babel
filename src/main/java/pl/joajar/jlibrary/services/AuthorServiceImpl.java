@@ -25,4 +25,10 @@ public class AuthorServiceImpl implements AuthorService {
         LOG.info("AuthorServiceImpl.findAll(): finding all authors from the library.");
         return authorRepository.findAll();
     }
+
+    @Override
+    public List<Author> saveAll(Iterable<Author> iterator) {
+        LOG.info("AuthorServiceImpl.saveAll(iterator): saving all authors from the iterator.");
+        return authorRepository.saveAll(iterator);
+    }
 }
