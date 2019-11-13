@@ -1,7 +1,5 @@
 package pl.joajar.jlibrary.domain;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.*;
 
 import javax.persistence.*;
@@ -9,16 +7,12 @@ import javax.validation.constraints.Pattern;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
 @AllArgsConstructor
+@Getter
+@Setter
 @ToString
 @Builder
 @Entity
 @Table(name="authors")
-@JsonIdentityInfo(
-        generator = ObjectIdGenerators.PropertyGenerator.class,
-        property = "id")
-/*see: https://stackoverflow.com/questions/3325387/infinite-recursion-with-jackson-json-and-hibernate-jpa-issue
-https://www.baeldung.com/jackson-bidirectional-relationships-and-infinite-recursion
- */
 public class Author {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -47,6 +47,7 @@ public class AuthorServiceImplTest {
 
         //then
         assertEquals(2, authors.size());
+        assertEquals(Arrays.asList(Horstmann, Bloch), authors);
         verify(authorRepository, times(1)).saveAll(anyList());
         verifyNoMoreInteractions(authorRepository);
     }
@@ -64,6 +65,7 @@ public class AuthorServiceImplTest {
 
         //then
         assertEquals(2, authors.size());
+        assertEquals(Arrays.asList(Horstmann, Bloch), authors);
         verify(authorRepository, times(1)).findAll();
         verifyNoMoreInteractions(authorRepository);
     }
