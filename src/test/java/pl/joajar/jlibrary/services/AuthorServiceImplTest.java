@@ -9,13 +9,15 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import pl.joajar.jlibrary.domain.Author;
+import pl.joajar.jlibrary.exceptions.ResourceNotFoundException;
 import pl.joajar.jlibrary.repository.AuthorRepository;
 
 import javax.transaction.Transactional;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -67,6 +69,38 @@ public class AuthorServiceImplTest {
         assertEquals(2, authors.size());
         assertEquals(Arrays.asList(Horstmann, Bloch), authors);
         verify(authorRepository, times(1)).findAll();
+        verifyNoMoreInteractions(authorRepository);
+    }
+
+    @Test
+    public void should_find_author_by_id() {
+        //given
+        final Author Bloch = Author.builder().firstName("Joshua").lastName("Bloch").build();
+        final Author author;
+
+        //when
+        when(authorRepository.findById(1L)).thenReturn(Optional.ofNullable(Bloch));
+        author = authorService.findById(1L);
+
+        //then
+        assertNotNull(author);
+        assertEquals(Bloch, author);
+        verify(authorRepository, times(1)).findById(1L);
+        verifyNoMoreInteractions(authorRepository);
+    }
+
+    @Test(expected = ResourceNotFoundException.class)
+    public void should_not_find_nonexistent_author_by_id() {
+        //given
+        final Author author;
+
+        //when
+        when(authorRepository.findById(anyLong())).thenThrow(ResourceNotFoundException.class);
+        author = authorService.findById(1L);
+
+        //then
+        assertNull(author);
+        verify(authorRepository, times(1)).findById(anyLong());
         verifyNoMoreInteractions(authorRepository);
     }
 }

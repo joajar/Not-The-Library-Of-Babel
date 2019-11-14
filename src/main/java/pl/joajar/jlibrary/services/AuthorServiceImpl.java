@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.joajar.jlibrary.domain.Author;
+import pl.joajar.jlibrary.exceptions.ResourceNotFoundException;
 import pl.joajar.jlibrary.repository.AuthorRepository;
 
 import java.util.List;
@@ -30,5 +31,11 @@ public class AuthorServiceImpl implements AuthorService {
     public List<Author> saveAll(Iterable<Author> iterator) {
         LOG.info("AuthorServiceImpl.saveAll(iterator): saving all authors from the iterator.");
         return authorRepository.saveAll(iterator);
+    }
+
+    @Override
+    public Author findById(Long id) throws ResourceNotFoundException {
+        return authorRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(id));
     }
 }

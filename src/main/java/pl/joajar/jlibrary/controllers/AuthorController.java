@@ -7,9 +7,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.joajar.jlibrary.domain.Author;
+import pl.joajar.jlibrary.exceptions.ResourceNotFoundException;
 import pl.joajar.jlibrary.services.AuthorService;
 
 import java.util.List;
@@ -30,5 +32,11 @@ public class AuthorController {
     public ResponseEntity<List<Author>> getAllAuthors() {
         LOG.info("AuthorController.getAllAuthors(): finding all authors from the library.");
         return new ResponseEntity<>(authorService.findAll(), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Author> getAuthorById(@PathVariable("id") Long id) throws ResourceNotFoundException {
+        LOG.info("AuthorController.getAuthorById(id): finding the author with id = {}.", id);
+        return new ResponseEntity<>(authorService.findById(id), HttpStatus.OK);
     }
 }

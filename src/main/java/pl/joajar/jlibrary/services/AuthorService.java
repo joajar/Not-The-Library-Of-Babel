@@ -8,4 +8,6 @@ public interface AuthorService {
     List<Author> findAll();
 
     List<Author> saveAll(Iterable<Author> iterator);
+
+    Author findById(Long id);
 }
