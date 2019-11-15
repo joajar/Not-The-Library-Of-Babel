@@ -17,9 +17,9 @@ public class LibraryExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(value = ResourceNotFoundException.class) // 404
     protected ResponseEntity<Object> handleResourceNotFound(ResourceNotFoundException ex) {
         ErrorResponse errorResponse = new ErrorResponse(
-            HttpStatus.NOT_FOUND, ex.getMessage(), Collections.singletonList("Resource does not exists.")
+            HttpStatus.NOT_FOUND, ex.getMessage(), Collections.singletonList("Resource does not exist.")
         );
-        LOG.info("LibraryExceptionHandler.handleResourceNotFound: throwing ResourceNotFoundException, resource does not exists.");
+        LOG.info("LibraryExceptionHandler.handleResourceNotFound: throwing ResourceNotFoundException, resource does not exist.");
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 }
