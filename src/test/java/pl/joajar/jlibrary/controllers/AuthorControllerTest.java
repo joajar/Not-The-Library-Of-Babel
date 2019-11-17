@@ -1,5 +1,6 @@
 package pl.joajar.jlibrary.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,6 +15,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import pl.joajar.jlibrary.domain.Author;
+import pl.joajar.jlibrary.dto.AuthorDTO;
+import pl.joajar.jlibrary.exceptions.DuplicateResourceException;
 import pl.joajar.jlibrary.exceptions.ResourceNotFoundException;
 import pl.joajar.jlibrary.services.AuthorServiceImpl;
 
@@ -25,6 +28,7 @@ import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -80,6 +84,7 @@ public class AuthorControllerTest {
         mockMvc.perform(get("/v1/library/authors/{id}", 1).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.id", Matchers.is(1)))
                 .andExpect(jsonPath("$.firstName", Matchers.is(Bloch.getFirstName())))
                 .andExpect(jsonPath("$.lastName", Matchers.is(Bloch.getLastName())));
 
@@ -88,7 +93,7 @@ public class AuthorControllerTest {
     }
 
     @Test
-    public void should_get_nonexistent_author_by_id_fail() throws Exception {
+    public void should_fail_while_getting_nonexistent_author() throws Exception {
         //when
         when(authorService.findById(anyLong())).thenThrow(ResourceNotFoundException.class);
 
@@ -96,7 +101,67 @@ public class AuthorControllerTest {
         mockMvc.perform(get("/v1/library/authors/{id}", 2).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
 
-        verify(authorService, times(1)).findById(2L);
+        verify(authorService, times(1)).findById(anyLong());
         verifyNoMoreInteractions(authorService);
+    }
+
+    @Test
+    public void should_post_author() throws Exception {
+        //given
+        final Author Bloch = Author.builder().id(1L).firstName("Joshua").lastName("Bloch").build();
+        final AuthorDTO BlochDTO = AuthorDTO.builder().firstName("Joshua").lastName("Bloch").build();
+
+        //when
+        when(authorService.save(any(AuthorDTO.class))).thenReturn(Bloch);
+
+        //then
+        mockMvc.perform(
+                post("/v1/library/authors")
+                        .content(asJsonString(BlochDTO))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.id", Matchers.is(1)))
+                .andExpect(jsonPath("$.firstName", Matchers.is(BlochDTO.getFirstName())))
+                .andExpect(jsonPath("$.lastName", Matchers.is(BlochDTO.getLastName())))
+        ;// ; put in the last line in order to allow work on particular lines of the test separately, similarly as in SQL
+
+        verify(authorService, times(1)).save(any(AuthorDTO.class));
+        verifyNoMoreInteractions(authorService);
+    }
+
+    @Test
+    public void should_fail_while_posting_author_that_exists_in_the_db() throws Exception {
+        //given
+        final AuthorDTO BlochDTO = AuthorDTO.builder().firstName("Joshua").lastName("Bloch").build();
+
+        //when
+        when(authorService.save(any(AuthorDTO.class))).thenThrow(DuplicateResourceException.class);
+
+        //then
+        mockMvc.perform(
+                post("/v1/library/authors")
+                        .content(asJsonString(BlochDTO))
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isConflict())
+        ;
+
+        verify(authorService, times(1)).save(any(AuthorDTO.class));
+        verifyNoMoreInteractions(authorService);
+    }
+
+
+    /*
+     * converts a Java object into JSON representation
+     */
+    public static String asJsonString(final Object o) {
+        try {
+            return new ObjectMapper().writeValueAsString(o);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
     }
 }

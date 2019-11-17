@@ -6,14 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pl.joajar.jlibrary.domain.Author;
-import pl.joajar.jlibrary.exceptions.ResourceNotFoundException;
+import pl.joajar.jlibrary.dto.AuthorDTO;
 import pl.joajar.jlibrary.services.AuthorService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -30,13 +28,20 @@ public class AuthorController {
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Author>> getAllAuthors() {
-        LOG.info("AuthorController.getAllAuthors(): finding all authors from the library.");
+        LOG.info("AuthorController.getAllAuthors: finding all authors from the library.");
         return new ResponseEntity<>(authorService.findAll(), HttpStatus.OK);
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Author> getAuthorById(@PathVariable("id") Long id) throws ResourceNotFoundException {
-        LOG.info("AuthorController.getAuthorById(id): finding the author with id = {}.", id);
+    public ResponseEntity<Author> getAuthorById(@PathVariable("id") Long id) {
+        LOG.info("AuthorController.getAuthorById: finding the author with id = {}.", id);
         return new ResponseEntity<>(authorService.findById(id), HttpStatus.OK);
+    }
+
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Author> postAuthor(@RequestBody @Valid AuthorDTO authorDTO) {
+        LOG.info("AuthorController.postAuthor: posting the author with the first name {} and the last name {}.",
+                authorDTO.getFirstName(), authorDTO.getLastName());
+        return new ResponseEntity<>(authorService.save(authorDTO), HttpStatus.CREATED);
     }
 }

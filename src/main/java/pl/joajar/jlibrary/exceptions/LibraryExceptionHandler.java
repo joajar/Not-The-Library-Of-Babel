@@ -17,9 +17,22 @@ public class LibraryExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(value = ResourceNotFoundException.class) // 404
     protected ResponseEntity<Object> handleResourceNotFound(ResourceNotFoundException ex) {
         ErrorResponse errorResponse = new ErrorResponse(
-            HttpStatus.NOT_FOUND, ex.getMessage(), Collections.singletonList("Resource does not exist.")
+                HttpStatus.NOT_FOUND,
+                ex.getMessage(),
+                Collections.singletonList("Resource does not exist.")
         );
         LOG.info("LibraryExceptionHandler.handleResourceNotFound: throwing ResourceNotFoundException, resource does not exist.");
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(value = DuplicateResourceException.class) // 409
+    protected ResponseEntity<Object> handleDuplicateResource(DuplicateResourceException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.CONFLICT,
+                ex.getMessage(),
+                Collections.singletonList("Resource already exist at the database.")
+        );
+        LOG.info("LibraryExceptionHandler.handleDuplicateResource: throwing DuplicateResourceException, resource already exist.");
+        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
     }
 }

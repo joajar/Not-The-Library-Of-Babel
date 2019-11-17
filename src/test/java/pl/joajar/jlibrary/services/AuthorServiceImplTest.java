@@ -9,6 +9,8 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import pl.joajar.jlibrary.domain.Author;
+import pl.joajar.jlibrary.dto.AuthorDTO;
+import pl.joajar.jlibrary.exceptions.DuplicateResourceException;
 import pl.joajar.jlibrary.exceptions.ResourceNotFoundException;
 import pl.joajar.jlibrary.repository.AuthorRepository;
 
@@ -95,12 +97,47 @@ public class AuthorServiceImplTest {
         final Author author;
 
         //when
-        when(authorRepository.findById(anyLong())).thenThrow(ResourceNotFoundException.class);
+        when(authorRepository.findById(1L)).thenThrow(ResourceNotFoundException.class);
         author = authorService.findById(1L);
 
         //then
         assertNull(author);
-        verify(authorRepository, times(1)).findById(anyLong());
+        verify(authorRepository, times(1)).findById(1L);
         verifyNoMoreInteractions(authorRepository);
     }
+
+    @Test
+    public void should_save_new_author() {
+        //given
+        Author Walls = Author.builder().id(6L).firstName("Craig").lastName("Walls").build();
+        AuthorDTO WallsDTO = AuthorDTO.builder().firstName("Craig").lastName("Walls").build();
+        final Author author;
+
+        //when
+        when(authorRepository.save(any(Author.class))).thenReturn(Walls);
+        author = authorService.save(WallsDTO);
+
+        //then
+        assertNotNull(author);
+        verify(authorRepository, times(1)).save(any(Author.class));
+        verify(authorRepository, times(1)).findByFirstNameAndLastName(anyString(), anyString());
+        verifyNoMoreInteractions(authorRepository);
+    }
+
+    @Test(expected = DuplicateResourceException.class)
+    public void should_fail_while_saving_author_that_exists() {
+        //given
+        AuthorDTO WallsDTO = AuthorDTO.builder().firstName("Craig").lastName("Walls").build();
+        final Author author;
+
+        //when
+        when(authorRepository.save(any(Author.class))).thenThrow(DuplicateResourceException.class);
+        author = authorService.save(WallsDTO);
+
+        //then
+        assertNull(author);
+        verify(authorRepository, times(1)).findByFirstNameAndLastName(anyString(), anyString());
+        verifyNoMoreInteractions(authorRepository);
+    }
+
 }

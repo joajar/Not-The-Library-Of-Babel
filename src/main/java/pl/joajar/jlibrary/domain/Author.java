@@ -4,8 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.Pattern;
-
-@NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
+@NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
@@ -26,4 +25,10 @@ public class Author {
     @Pattern(regexp = "^[\\p{Alnum}]{2,}$", message = "Last name should consist of at least 2 alphanumeric signs.")
     @Column(name = "last_name")
     private String lastName;
+
+
+    public Author(String firstName, String lastName) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
 }
