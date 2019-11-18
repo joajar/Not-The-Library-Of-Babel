@@ -107,6 +107,40 @@ public class AuthorServiceImplTest {
     }
 
     @Test
+    public void should_find_author_at_random() {
+        //given
+        final Author Bloch = Author.builder().firstName("Joshua").lastName("Bloch").build();
+        final Author author;
+
+        //when
+        when(authorRepository.findById(anyLong())).thenReturn(Optional.ofNullable(Bloch));
+        when(authorRepository.count()).thenReturn(12L);
+        author = authorService.findAtRandom();
+
+        //then
+        assertNotNull(author);
+        assertEquals(Bloch, author);
+        verify(authorRepository, times(1)).count();
+        verify(authorRepository, times(1)).findById(anyLong());
+        verifyNoMoreInteractions(authorRepository);
+    }
+
+    @Test(expected = ResourceNotFoundException.class)
+    public void should_fail_while_finding_author_at_random_when_there_is_no_author() {
+        //given
+        final Author author;
+
+        //when
+        when(authorRepository.count()).thenReturn(0L);
+        author = authorService.findAtRandom();
+
+        //then
+        assertNull(author);
+        verify(authorRepository, times(1)).count();
+        verifyNoMoreInteractions(authorRepository);
+    }
+
+    @Test
     public void should_save_new_author() {
         //given
         Author Walls = Author.builder().id(6L).firstName("Craig").lastName("Walls").build();

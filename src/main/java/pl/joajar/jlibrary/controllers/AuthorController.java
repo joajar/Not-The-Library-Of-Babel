@@ -38,6 +38,12 @@ public class AuthorController {
         return new ResponseEntity<>(authorService.findById(id), HttpStatus.OK);
     }
 
+    @GetMapping(value = "/random", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Author> getAuthorAtRandom() {
+        LOG.info("AuthorController.getAuthorAtRandom: finding one author at random.");
+        return new ResponseEntity<>(authorService.findAtRandom(), HttpStatus.OK);
+    }
+
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Author> postAuthor(@RequestBody @Valid AuthorDTO authorDTO) {
         LOG.info("AuthorController.postAuthor: posting the author with the first name {} and the last name {}.",

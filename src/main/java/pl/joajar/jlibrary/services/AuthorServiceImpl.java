@@ -42,6 +42,17 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
+    public Author findAtRandom() throws ResourceNotFoundException {
+        long authorsListSize = authorRepository.count();
+        LOG.info("AuthorServiceImpl.findAtRandom: finding one author at random, out of {} authors", authorsListSize);
+        if (authorsListSize == 0) throw new ResourceNotFoundException("There is no author at the database!");
+
+        Long id = (long) (Math.random() * authorsListSize) + 1;
+
+        return findById(id);
+    }
+
+    @Override
     public Author save(AuthorDTO authorDTO) throws DuplicateResourceException {
         if (authorRepository.findByFirstNameAndLastName(authorDTO.getFirstName(), authorDTO.getLastName()).isPresent())
         {

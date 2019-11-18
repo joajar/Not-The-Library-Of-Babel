@@ -106,6 +106,39 @@ public class AuthorControllerTest {
     }
 
     @Test
+    public void should_get_author_at_random() throws Exception {
+        //given
+        final Author Bloch = Author.builder().id(1L).firstName("Joshua").lastName("Bloch").build();
+
+        //when
+        when(authorService.findAtRandom()).thenReturn(Bloch);
+
+        //then
+        mockMvc.perform(get("/v1/library/authors/random").accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.id", Matchers.is(1)))
+                .andExpect(jsonPath("$.firstName", Matchers.is(Bloch.getFirstName())))
+                .andExpect(jsonPath("$.lastName", Matchers.is(Bloch.getLastName())));
+
+        verify(authorService, times(1)).findAtRandom();
+        verifyNoMoreInteractions(authorService);
+    }
+
+    @Test
+    public void should_fail_while_getting_at_random_when_there_is_no_author_at_the_database() throws Exception {
+        //when
+        when(authorService.findAtRandom()).thenThrow(ResourceNotFoundException.class);
+
+        //then
+        mockMvc.perform(get("/v1/library/authors/random").accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isNotFound());
+
+        verify(authorService, times(1)).findAtRandom();
+        verifyNoMoreInteractions(authorService);
+    }
+
+    @Test
     public void should_post_author() throws Exception {
         //given
         final Author Bloch = Author.builder().id(1L).firstName("Joshua").lastName("Bloch").build();
