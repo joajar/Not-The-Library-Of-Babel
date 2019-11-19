@@ -1,9 +1,12 @@
 package pl.joajar.jlibrary.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.Pattern;
+import java.util.Set;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -26,6 +29,11 @@ public class Author {
     @Column(name = "last_name")
     private String lastName;
 
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
+    @JsonBackReference
+//    see: https://stackoverflow.com/questions/3325387/infinite-recursion-with-jackson-json-and-hibernate-jpa-issue
+//    https://www.baeldung.com/jackson-bidirectional-relationships-and-infinite-recursion
+    private Set<BookAuthorship> bookAuthorshipSet;
 
     public Author(String firstName, String lastName) {
         this.firstName = firstName;

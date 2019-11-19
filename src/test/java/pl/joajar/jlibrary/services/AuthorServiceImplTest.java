@@ -46,7 +46,7 @@ public class AuthorServiceImplTest {
         final List<Author> authors;
 
         //when
-        when(authorService.saveAll(Arrays.asList(Horstmann, Bloch))).thenReturn(Arrays.asList(Horstmann, Bloch));
+        when(authorRepository.saveAll(Arrays.asList(Horstmann, Bloch))).thenReturn(Arrays.asList(Horstmann, Bloch));
         authors = authorService.saveAll(Arrays.asList(Horstmann, Bloch));
 
         //then
@@ -143,8 +143,8 @@ public class AuthorServiceImplTest {
     @Test
     public void should_save_new_author() {
         //given
-        Author Walls = Author.builder().id(6L).firstName("Craig").lastName("Walls").build();
-        AuthorDTO WallsDTO = AuthorDTO.builder().firstName("Craig").lastName("Walls").build();
+        final Author Walls = Author.builder().id(6L).firstName("Craig").lastName("Walls").build();
+        final AuthorDTO WallsDTO = AuthorDTO.builder().firstName("Craig").lastName("Walls").build();
         final Author author;
 
         //when
@@ -153,6 +153,8 @@ public class AuthorServiceImplTest {
 
         //then
         assertNotNull(author);
+        assertEquals("Craig", author.getFirstName());
+        assertEquals("Walls", author.getLastName());
         verify(authorRepository, times(1)).save(any(Author.class));
         verify(authorRepository, times(1)).findByFirstNameAndLastName(anyString(), anyString());
         verifyNoMoreInteractions(authorRepository);
