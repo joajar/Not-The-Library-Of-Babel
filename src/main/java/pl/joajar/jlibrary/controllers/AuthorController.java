@@ -1,5 +1,6 @@
 package pl.joajar.jlibrary.controllers;
 
+import lombok.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,5 +50,12 @@ public class AuthorController {
         LOG.info("AuthorController.postAuthor: posting the author with the first name {} and the last name {}.",
                 authorDTO.getFirstName(), authorDTO.getLastName());
         return new ResponseEntity<>(authorService.save(authorDTO), HttpStatus.CREATED);
+    }
+
+    //For usage when *some* new properties (firstName or lastName) are null, and only non-null properties are replacing old ones
+    @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Author> patchAuthor(@PathVariable("id") Long id, @RequestBody @NonNull AuthorDTO authorDTO) {
+        LOG.info("AuthorController.patchAuthor: updating the author with id = {} (possibly some attributes only).", id);
+        return new ResponseEntity<>(authorService.updateAttributesThenSave(id, authorDTO), HttpStatus.OK);
     }
 }

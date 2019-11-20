@@ -11,6 +11,7 @@ import pl.joajar.jlibrary.exceptions.ResourceNotFoundException;
 import pl.joajar.jlibrary.repository.AuthorRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AuthorServiceImpl implements AuthorService {
@@ -62,5 +63,32 @@ public class AuthorServiceImpl implements AuthorService {
         LOG.info("AuthorServiceImpl.save: saving under id = {} the author with the first name {} and the last name {}.",
                 author.getId(), author.getFirstName(), author.getLastName());
         return author;
+    }
+
+    @Override
+    public Author updateAttributesOfAuthorFound(Author author, AuthorDTO authorDTO) {
+
+        author.setFirstName(
+                Optional.ofNullable(authorDTO.getFirstName())
+                        .filter(firstName -> firstName.length() > 0)
+                        .orElse(author.getFirstName())
+        );
+
+        author.setLastName(
+                Optional.ofNullable(authorDTO.getLastName())
+                        .filter(lastName -> lastName.length() > 0)
+                        .orElse(author.getLastName())
+        );
+
+        LOG.info("AuthorServiceImpl.updateAttributesOfFoundAuthor: updating attributes of the given author.");
+        return author;
+    }
+
+    @Override
+    public Author updateAttributesThenSave(Long id, AuthorDTO authorDTO) throws ResourceNotFoundException {
+
+        Author author = findById(id);
+
+        return authorRepository.save(updateAttributesOfAuthorFound(author, authorDTO));
     }
 }

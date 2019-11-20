@@ -17,4 +17,9 @@ public interface AuthorService {
     Author findAtRandom() throws ResourceNotFoundException;
 
     Author save(AuthorDTO authorDTO) throws DuplicateResourceException;
+
+    Author updateAttributesOfAuthorFound(Author author, AuthorDTO authorDTO);
+
+    Author updateAttributesThenSave(Long id, AuthorDTO authorDTO) throws ResourceNotFoundException;
+
 }

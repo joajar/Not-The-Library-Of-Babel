@@ -156,7 +156,7 @@ public class AuthorServiceImplTest {
         assertEquals("Craig", author.getFirstName());
         assertEquals("Walls", author.getLastName());
         verify(authorRepository, times(1)).save(any(Author.class));
-        verify(authorRepository, times(1)).findByFirstNameAndLastName(anyString(), anyString());
+        verify(authorRepository, times(1)).findByFirstNameAndLastName("Craig", "Walls");
         verifyNoMoreInteractions(authorRepository);
     }
 
@@ -167,13 +167,56 @@ public class AuthorServiceImplTest {
         final Author author;
 
         //when
-        when(authorRepository.save(any(Author.class))).thenThrow(DuplicateResourceException.class);
+        when(authorRepository.findByFirstNameAndLastName("Craig", "Walls")).thenThrow(DuplicateResourceException.class);
         author = authorService.save(WallsDTO);
 
         //then
         assertNull(author);
-        verify(authorRepository, times(1)).findByFirstNameAndLastName(anyString(), anyString());
+        verify(authorRepository, times(1)).findByFirstNameAndLastName("Craig", "Walls");
         verifyNoMoreInteractions(authorRepository);
+    }
+
+    @Test
+    public void should_update_all_author_attributes() {
+        //given
+        final Author Bloch_to_check_updating_all_attributes = Author.builder().id(11L).firstName("Joshua").lastName("Bloch").build();
+        final Author Horstmann_to_check_updating_firstName = Author.builder().id(12L).firstName("Cay S.").lastName("Horstmann").build();
+        final Author Horstmann_to_check_updating_lastName = Author.builder().id(13L).firstName("Cay S.").lastName("Horstmann").build();
+
+        final AuthorDTO WallsDTO_to_check_updating_all_attributes = AuthorDTO.builder().firstName("Craig").lastName("Walls").build();
+        final AuthorDTO WallsDTO_to_check_updating_firstName = AuthorDTO.builder().firstName("Craig").lastName("").build();
+        final AuthorDTO WallsDTO_to_check_updating_lastName = AuthorDTO.builder().firstName("").lastName("Walls").build();
+
+        final Author author_to_check_updating_all_attributes, author_to_check_updating_firstName, author_to_check_updating_lastName;
+
+        //when
+        author_to_check_updating_all_attributes = authorService.updateAttributesOfAuthorFound(
+                Bloch_to_check_updating_all_attributes, WallsDTO_to_check_updating_all_attributes
+        );
+        author_to_check_updating_firstName = authorService.updateAttributesOfAuthorFound(
+                Horstmann_to_check_updating_firstName, WallsDTO_to_check_updating_firstName
+        );
+        author_to_check_updating_lastName = authorService.updateAttributesOfAuthorFound(
+                Horstmann_to_check_updating_lastName, WallsDTO_to_check_updating_lastName
+        );
+
+        //then
+        assertNotNull(author_to_check_updating_all_attributes);
+        assertEquals(11L, (long) author_to_check_updating_all_attributes.getId());
+        assertEquals("Craig", author_to_check_updating_all_attributes.getFirstName());
+        assertEquals("Walls", author_to_check_updating_all_attributes.getLastName());
+
+        assertNotNull(author_to_check_updating_firstName);
+        assertEquals(12L, (long) author_to_check_updating_firstName.getId());
+        assertEquals("Craig", author_to_check_updating_firstName.getFirstName());
+        assertEquals("Horstmann", author_to_check_updating_firstName.getLastName());
+
+        assertNotNull(author_to_check_updating_lastName);
+        assertEquals(13L, (long) author_to_check_updating_lastName.getId());
+        assertEquals("Cay S.", author_to_check_updating_lastName.getFirstName());
+        assertEquals("Walls", author_to_check_updating_lastName.getLastName());
+
+        verifyNoInteractions(authorRepository);
     }
 
 }

@@ -26,9 +26,7 @@ import java.util.Arrays;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -63,8 +61,12 @@ public class AuthorControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0].id").exists())
+                .andExpect(jsonPath("$[0].id").value(Matchers.is(1)))
                 .andExpect(jsonPath("$[0].firstName", is("Cay S.")))
                 .andExpect(jsonPath("$[0].lastName", is("Horstmann")))
+                .andExpect(jsonPath("$[1].id").exists())
+                .andExpect(jsonPath("$[1].id").value(Matchers.is(2)))
                 .andExpect(jsonPath("$[1].firstName", is("Joshua")))
                 .andExpect(jsonPath("$[1].lastName", is("Bloch")));
 
@@ -84,9 +86,10 @@ public class AuthorControllerTest {
         mockMvc.perform(get("/v1/library/authors/{id}", 1).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.id", Matchers.is(1)))
-                .andExpect(jsonPath("$.firstName", Matchers.is(Bloch.getFirstName())))
-                .andExpect(jsonPath("$.lastName", Matchers.is(Bloch.getLastName())));
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.id").value(Matchers.is(1)))
+                .andExpect(jsonPath("$.firstName").value(Matchers.is(Bloch.getFirstName())))
+                .andExpect(jsonPath("$.lastName").value(Matchers.is(Bloch.getLastName())));
 
         verify(authorService, times(1)).findById(1L);
         verifyNoMoreInteractions(authorService);
@@ -117,9 +120,10 @@ public class AuthorControllerTest {
         mockMvc.perform(get("/v1/library/authors/random").accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.id", Matchers.is(1)))
-                .andExpect(jsonPath("$.firstName", Matchers.is(Bloch.getFirstName())))
-                .andExpect(jsonPath("$.lastName", Matchers.is(Bloch.getLastName())));
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.id").value(Matchers.is(1)))
+                .andExpect(jsonPath("$.firstName").value(Matchers.is(Bloch.getFirstName())))
+                .andExpect(jsonPath("$.lastName").value(Matchers.is(Bloch.getLastName())));
 
         verify(authorService, times(1)).findAtRandom();
         verifyNoMoreInteractions(authorService);
@@ -156,9 +160,10 @@ public class AuthorControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.id", Matchers.is(1)))
-                .andExpect(jsonPath("$.firstName", Matchers.is(BlochDTO.getFirstName())))
-                .andExpect(jsonPath("$.lastName", Matchers.is(BlochDTO.getLastName())))
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.id").value(Matchers.is(1)))
+                .andExpect(jsonPath("$.firstName").value(Matchers.is(BlochDTO.getFirstName())))
+                .andExpect(jsonPath("$.lastName").value(Matchers.is(BlochDTO.getLastName())))
         ;// ; put in the last line in order to allow work on particular lines of the test separately, similarly as in SQL
 
         verify(authorService, times(1)).save(any(AuthorDTO.class));
@@ -183,6 +188,54 @@ public class AuthorControllerTest {
         ;
 
         verify(authorService, times(1)).save(any(AuthorDTO.class));
+        verifyNoMoreInteractions(authorService);
+    }
+
+    @Test
+    public void should_update_all_author_attributes() throws Exception {
+        //given
+        final Author Bloch = Author.builder().id(14L).firstName("Joshua").lastName("Bloch").build();
+        final AuthorDTO BlochDTO = AuthorDTO.builder().firstName("Joshua").lastName("Bloch").build();
+
+        //when
+        when(authorService.updateAttributesThenSave(anyLong(), any(AuthorDTO.class))).thenReturn(Bloch);
+
+        //then
+        mockMvc.perform(
+                patch("/v1/library/authors/{id}", 14)
+                        .content(asJsonString(BlochDTO))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.id").value(Matchers.is(14)))
+                .andExpect(jsonPath("$.firstName").value(Matchers.is(Bloch.getFirstName())))
+                .andExpect(jsonPath("$.lastName").value(Matchers.is(Bloch.getLastName())))
+        ;
+
+        verify(authorService, times(1)).updateAttributesThenSave(anyLong(), any(AuthorDTO.class));
+        verifyNoMoreInteractions(authorService);
+    }
+
+    @Test
+    public void should_fail_while_patching_author_that_exists_in_the_db() throws Exception {
+        //given
+        final AuthorDTO BlochDTO = AuthorDTO.builder().firstName("Joshua").lastName("Bloch").build();
+
+        //when
+        when(authorService.updateAttributesThenSave(anyLong(), any(AuthorDTO.class))).thenThrow(ResourceNotFoundException.class);
+
+        //then
+        mockMvc.perform(
+                patch("/v1/library/authors/{id}", 14)
+                        .content(asJsonString(BlochDTO))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+        ;
+
+        verify(authorService, times(1)).updateAttributesThenSave(anyLong(), any(AuthorDTO.class));
         verifyNoMoreInteractions(authorService);
     }
 
