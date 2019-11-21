@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import pl.joajar.jlibrary.domain.Author;
 import pl.joajar.jlibrary.dto.AuthorDTO;
 import pl.joajar.jlibrary.exceptions.DuplicateResourceException;
+import pl.joajar.jlibrary.exceptions.NullDataProvidedException;
 import pl.joajar.jlibrary.exceptions.ResourceNotFoundException;
 import pl.joajar.jlibrary.services.AuthorServiceImpl;
 
@@ -236,6 +237,48 @@ public class AuthorControllerTest {
         ;
 
         verify(authorService, times(1)).updateAttributesThenSave(anyLong(), any(AuthorDTO.class));
+        verifyNoMoreInteractions(authorService);
+    }
+
+    @Test
+    public void should_fail_while_putting_author_that_exists_in_the_db() throws Exception {
+        //given
+        final AuthorDTO BlochDTO = AuthorDTO.builder().firstName("Joshua").lastName("Bloch").build();
+
+        //when
+        when(authorService.updateAuthorThenSave(anyLong(), any(AuthorDTO.class))).thenThrow(ResourceNotFoundException.class);
+
+        //then
+        mockMvc.perform(
+                put("/v1/library/authors/{id}", 14)
+                        .content(asJsonString(BlochDTO))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+        ;
+
+        verify(authorService, times(1)).updateAuthorThenSave(anyLong(), any(AuthorDTO.class));
+        verifyNoMoreInteractions(authorService);
+    }
+
+    @Test
+    public void should_fail_while_putting_author_and_obtaining_empty_firstName() throws Exception {
+        //given
+        final AuthorDTO BlochDTO = AuthorDTO.builder().firstName("").lastName("Bloch").build();
+
+        //when
+        when(authorService.updateAuthorThenSave(anyLong(), any(AuthorDTO.class))).thenThrow(NullDataProvidedException.class);
+
+        //then
+        mockMvc.perform(
+                put("/v1/library/authors/{id}", 13)
+                        .content(asJsonString(BlochDTO))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotAcceptable())
+        ;
+
+        verify(authorService, times(1)).updateAuthorThenSave(anyLong(), any(AuthorDTO.class));
         verifyNoMoreInteractions(authorService);
     }
 

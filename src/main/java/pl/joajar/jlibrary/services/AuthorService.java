@@ -3,6 +3,7 @@ package pl.joajar.jlibrary.services;
 import pl.joajar.jlibrary.domain.Author;
 import pl.joajar.jlibrary.dto.AuthorDTO;
 import pl.joajar.jlibrary.exceptions.DuplicateResourceException;
+import pl.joajar.jlibrary.exceptions.NullDataProvidedException;
 import pl.joajar.jlibrary.exceptions.ResourceNotFoundException;
 
 import java.util.List;
@@ -22,4 +23,7 @@ public interface AuthorService {
 
     Author updateAttributesThenSave(Long id, AuthorDTO authorDTO) throws ResourceNotFoundException;
 
+    Author updateFoundAuthor(Author author, AuthorDTO authorDTO) throws NullDataProvidedException;
+
+    Author updateAuthorThenSave(Long anyLong, AuthorDTO authorDTO) throws ResourceNotFoundException, NullDataProvidedException;
 }

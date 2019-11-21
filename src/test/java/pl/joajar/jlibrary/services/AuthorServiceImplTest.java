@@ -11,6 +11,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import pl.joajar.jlibrary.domain.Author;
 import pl.joajar.jlibrary.dto.AuthorDTO;
 import pl.joajar.jlibrary.exceptions.DuplicateResourceException;
+import pl.joajar.jlibrary.exceptions.NullDataProvidedException;
 import pl.joajar.jlibrary.exceptions.ResourceNotFoundException;
 import pl.joajar.jlibrary.repository.AuthorRepository;
 
@@ -218,5 +219,61 @@ public class AuthorServiceImplTest {
 
         verifyNoInteractions(authorRepository);
     }
+
+    @Test
+    public void should_update_author() {
+        //given
+        final Author Bloch = Author.builder().id(11L).firstName("Joshua").lastName("Bloch").build();
+
+        final AuthorDTO WallsDTO = AuthorDTO.builder().firstName("Craig").lastName("Walls").build();
+
+        final Author author;
+
+        //when
+        author = authorService.updateFoundAuthor(Bloch, WallsDTO);
+
+        //then
+        assertNotNull(author);
+        assertEquals(11L, (long) author.getId());
+        assertEquals("Craig", author.getFirstName());
+        assertEquals("Walls", author.getLastName());
+        verifyNoInteractions(authorRepository);
+    }
+
+    @Test(expected = NullDataProvidedException.class)
+    public void should_fail_while_updating_author_when_firstName_is_empty_String() {
+        //given
+        final Author Bloch = Author.builder().id(11L).firstName("Joshua").lastName("Bloch").build();
+
+        final AuthorDTO WallsDTO = AuthorDTO.builder().firstName("").lastName("Walls").build();
+
+        final Author author;
+
+        //when
+        author = authorService.updateFoundAuthor(Bloch, WallsDTO);
+
+        //then
+        assertNull(author);
+        verifyNoInteractions(authorRepository);
+    }
+
+    @Test(expected = NullDataProvidedException.class)
+    public void should_fail_while_updating_author_when_lastName_is_empty_String() {
+        //given
+        final Author Bloch = Author.builder().id(11L).firstName("Joshua").lastName("Bloch").build();
+
+        final AuthorDTO WallsDTO = AuthorDTO.builder().firstName("Craig").lastName("").build();
+
+        final Author author;
+
+        //when
+        author = authorService.updateFoundAuthor(Bloch, WallsDTO);
+
+        //then
+        assertNull(author);
+        verifyNoInteractions(authorRepository);
+    }
+
+
 
 }

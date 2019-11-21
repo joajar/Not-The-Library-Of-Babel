@@ -35,4 +35,16 @@ public class LibraryExceptionHandler extends ResponseEntityExceptionHandler {
         LOG.info("LibraryExceptionHandler.handleDuplicateResource: throwing DuplicateResourceException, resource already exist.");
         return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
     }
+
+    @ExceptionHandler(value = NullDataProvidedException.class) // 406
+    protected ResponseEntity<Object> handleNullDataProvided(NullDataProvidedException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.NOT_ACCEPTABLE,
+                ex.getMessage(),
+                Collections.singletonList("Provided data contain null or empty String.")
+        );
+        LOG.info("LibraryExceptionHandler.handleNullDataProvided: throwing NullDataProvidedException, provided data contain null or empty String.");
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_ACCEPTABLE);
+
+    }
 }

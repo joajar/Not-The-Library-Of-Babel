@@ -52,10 +52,17 @@ public class AuthorController {
         return new ResponseEntity<>(authorService.save(authorDTO), HttpStatus.CREATED);
     }
 
-    //For usage when *some* new properties (firstName or lastName) are null, and only non-null properties are replacing old ones
+    //For usage when *some* new properties (firstName or lastName) are null, and only non-null properties are replacing the old ones
     @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Author> patchAuthor(@PathVariable("id") Long id, @RequestBody @NonNull AuthorDTO authorDTO) {
-        LOG.info("AuthorController.patchAuthor: updating the author with id = {} (possibly some attributes only).", id);
+        LOG.info("AuthorController.patchAuthor: updating all attributes of the author with id = {} (possibly some attributes only).", id);
         return new ResponseEntity<>(authorService.updateAttributesThenSave(id, authorDTO), HttpStatus.OK);
+    }
+
+    //For usage in case *all* new properties (firstName, lastName) are non-null, and have to replace the old ones
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Author> putAuthor(@PathVariable("id") Long id, @RequestBody @NonNull AuthorDTO authorDTO) {
+        LOG.info("AuthorController.putAuthor: updating the author with id = {}.", id);
+        return new ResponseEntity<>(authorService.updateAuthorThenSave(id, authorDTO), HttpStatus.OK);
     }
 }
