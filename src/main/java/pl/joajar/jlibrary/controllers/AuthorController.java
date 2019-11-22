@@ -65,4 +65,12 @@ public class AuthorController {
         LOG.info("AuthorController.putAuthor: updating the author with id = {}.", id);
         return new ResponseEntity<>(authorService.updateAuthorThenSave(id, authorDTO), HttpStatus.OK);
     }
+
+    //Below you may find the idea of HttpStatus.NO_CONTENT usage and customerService.deleteAuthor taken from Walls' book "Spring in Action, 5ed", p.148
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<Void> deleteAuthor(@PathVariable("id") Long id) {
+        LOG.info("AuthorController.deleteAuthor: deleting the author with id = {} or checking there is no author under this id.", id);
+        authorService.delete(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }

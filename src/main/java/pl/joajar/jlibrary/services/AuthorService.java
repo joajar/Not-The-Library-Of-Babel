@@ -26,4 +26,6 @@ public interface AuthorService {
     Author updateFoundAuthor(Author author, AuthorDTO authorDTO) throws NullDataProvidedException;
 
     Author updateAuthorThenSave(Long anyLong, AuthorDTO authorDTO) throws ResourceNotFoundException, NullDataProvidedException;
+
+    void delete(Long id);
 }

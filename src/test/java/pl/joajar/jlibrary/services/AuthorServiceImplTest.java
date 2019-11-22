@@ -6,8 +6,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import pl.joajar.jlibrary.domain.Author;
 import pl.joajar.jlibrary.dto.AuthorDTO;
 import pl.joajar.jlibrary.exceptions.DuplicateResourceException;
@@ -15,7 +14,6 @@ import pl.joajar.jlibrary.exceptions.NullDataProvidedException;
 import pl.joajar.jlibrary.exceptions.ResourceNotFoundException;
 import pl.joajar.jlibrary.repository.AuthorRepository;
 
-import javax.transaction.Transactional;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -23,9 +21,7 @@ import java.util.Optional;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Transactional
+@RunWith(MockitoJUnitRunner.class)
 public class AuthorServiceImplTest {
     @Mock
     private AuthorRepository authorRepository;
@@ -274,6 +270,30 @@ public class AuthorServiceImplTest {
         verifyNoInteractions(authorRepository);
     }
 
+    @Test
+    public void should_delete_author() {
+        //given
+        final Author Walls = Author.builder().id(6L).firstName("Craig").lastName("Walls").build();
 
+        //when
+        when(authorRepository.findById(6L)).thenReturn(Optional.of(Walls));
+        doNothing().when(authorRepository).delete(Walls);
+        authorService.delete(6L);
 
+        //then
+        verify(authorRepository, times(2)).findById(6L);
+        verify(authorRepository, times(1)).delete(any(Author.class));
+        verifyNoMoreInteractions(authorRepository);
+    }
+
+    @Test
+    public void should_do_nothing_while_trying_to_delete_nonexistent_author() {
+        //when
+        when(authorRepository.findById(6L)).thenReturn(Optional.empty());
+        authorService.delete(6L);
+
+        //then
+        verify(authorRepository, times(1)).findById(6L);
+        verifyNoMoreInteractions(authorRepository);
+    }
 }

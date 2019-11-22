@@ -120,5 +120,12 @@ public class AuthorServiceImpl implements AuthorService {
         return authorRepository.save(updateFoundAuthor(author, authorDTO));
     }
 
+    @Override
+    public void delete(Long id) {
+        if (authorRepository.findById(id).isPresent())
+            authorRepository.delete(authorRepository.findById(id).get());
+        LOG.info("AuthorServiceImpl.delete: deleting the author with id = {} provided it exists.", id);
+    }
+
 
 }

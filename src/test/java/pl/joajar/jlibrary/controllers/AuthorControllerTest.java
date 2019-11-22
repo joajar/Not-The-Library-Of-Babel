@@ -7,21 +7,19 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import pl.joajar.jlibrary.domain.Author;
 import pl.joajar.jlibrary.dto.AuthorDTO;
 import pl.joajar.jlibrary.exceptions.DuplicateResourceException;
+import pl.joajar.jlibrary.exceptions.LibraryExceptionHandler;
 import pl.joajar.jlibrary.exceptions.NullDataProvidedException;
 import pl.joajar.jlibrary.exceptions.ResourceNotFoundException;
 import pl.joajar.jlibrary.services.AuthorServiceImpl;
 
-import javax.transaction.Transactional;
 import java.util.Arrays;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -30,9 +28,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Transactional
+@RunWith(MockitoJUnitRunner.class)
 public class AuthorControllerTest {
     private MockMvc mockMvc;
 
@@ -44,8 +40,10 @@ public class AuthorControllerTest {
 
     @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
-        mockMvc = MockMvcBuilders.standaloneSetup(authorController).build();
+
+        mockMvc = MockMvcBuilders.standaloneSetup(authorController)
+                .setControllerAdvice(new LibraryExceptionHandler())
+                .build();
     }
 
     @Test
@@ -241,6 +239,33 @@ public class AuthorControllerTest {
     }
 
     @Test
+    public void should_update_author_while_putting() throws Exception {
+        //given
+        final Author Bloch = Author.builder().id(14L).firstName("Joshua").lastName("Bloch").build();
+        final AuthorDTO BlochDTO = AuthorDTO.builder().firstName("Joshua").lastName("Bloch").build();
+
+        //when
+        when(authorService.updateAuthorThenSave(anyLong(), any(AuthorDTO.class))).thenReturn(Bloch);
+
+        //then
+        mockMvc.perform(
+                put("/v1/library/authors/{id}", 14)
+                        .content(asJsonString(BlochDTO))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.id").value(Matchers.is(14)))
+                .andExpect(jsonPath("$.firstName").value(Matchers.is(Bloch.getFirstName())))
+                .andExpect(jsonPath("$.lastName").value(Matchers.is(Bloch.getLastName())))
+        ;
+
+        verify(authorService, times(1)).updateAuthorThenSave(anyLong(), any(AuthorDTO.class));
+        verifyNoMoreInteractions(authorService);
+    }
+
+    @Test
     public void should_fail_while_putting_author_that_exists_in_the_db() throws Exception {
         //given
         final AuthorDTO BlochDTO = AuthorDTO.builder().firstName("Joshua").lastName("Bloch").build();
@@ -281,6 +306,21 @@ public class AuthorControllerTest {
         verify(authorService, times(1)).updateAuthorThenSave(anyLong(), any(AuthorDTO.class));
         verifyNoMoreInteractions(authorService);
     }
+
+    @Test
+    public void should_proceed_delete_author_method() throws Exception {
+        //when
+        doNothing().when(authorService).delete(7L);
+
+        //then
+        mockMvc.perform(
+                delete("/v1/library/authors/{id}", 7))
+                .andExpect(status().isNoContent());
+
+        verify(authorService, times(1)).delete(7L);
+        verifyNoMoreInteractions(authorService);
+    }
+
 
 
     /*
