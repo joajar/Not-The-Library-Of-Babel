@@ -36,7 +36,13 @@ public class AuthorController {
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Author> getAuthorById(@PathVariable("id") Long id) throws ResourceNotFoundException {
-        LOG.info("AuthorController.getAuthorById(id): finding the author with id = {}.", id);
+        LOG.info("AuthorController.getAuthorById: finding the author with id = {}.", id);
         return new ResponseEntity<>(authorService.findById(id), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/random", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Author> getAuthorAtRandom() {
+        LOG.info("AuthorController.getAuthorAtRandom: finding one author at random.");
+        return new ResponseEntity<>(authorService.findAtRandom(), HttpStatus.OK);
     }
 }

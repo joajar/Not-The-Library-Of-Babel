@@ -26,7 +26,8 @@ public class AnnotationDrivenContextStartedListener {
         Author King = Author.builder().id(4L).firstName("Gavin").lastName("King").build();
         Author Gregory = Author.builder().id(5L).firstName("Gary").lastName("Gregory").build();
         Author Walls = Author.builder().id(6L).firstName("Craig").lastName("Walls").build();
+        Author Mehta = Author.builder().id(7L).firstName("Bhakti").lastName("Mehta").build();
 
-        authorService.saveAll(Arrays.asList(Horstmann, Bloch, Bauer, King, Gregory, Walls));
+        authorService.saveAll(Arrays.asList(Horstmann, Bloch, Bauer, King, Gregory, Walls, Mehta));
     }
 }

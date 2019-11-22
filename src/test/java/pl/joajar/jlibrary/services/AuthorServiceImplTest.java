@@ -6,13 +6,11 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import pl.joajar.jlibrary.domain.Author;
 import pl.joajar.jlibrary.exceptions.ResourceNotFoundException;
 import pl.joajar.jlibrary.repository.AuthorRepository;
 
-import javax.transaction.Transactional;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -20,9 +18,7 @@ import java.util.Optional;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Transactional
+@RunWith(MockitoJUnitRunner.class)
 public class AuthorServiceImplTest {
     @Mock
     private AuthorRepository authorRepository;
@@ -95,12 +91,46 @@ public class AuthorServiceImplTest {
         final Author author;
 
         //when
-        when(authorRepository.findById(anyLong())).thenThrow(ResourceNotFoundException.class);
+        when(authorRepository.findById(1L)).thenThrow(ResourceNotFoundException.class);
         author = authorService.findById(1L);
 
         //then
         assertNull(author);
+        verify(authorRepository, times(1)).findById(1L);
+        verifyNoMoreInteractions(authorRepository);
+    }
+
+    @Test
+    public void should_find_author_at_random() {
+        //given
+        final Author Bloch = Author.builder().firstName("Joshua").lastName("Bloch").build();
+        final Author author;
+
+        //when
+        when(authorRepository.findById(anyLong())).thenReturn(Optional.ofNullable(Bloch));
+        when(authorRepository.count()).thenReturn(12L);
+        author = authorService.findAtRandom();
+
+        //then
+        assertNotNull(author);
+        assertEquals(Bloch, author);
+        verify(authorRepository, times(1)).count();
         verify(authorRepository, times(1)).findById(anyLong());
+        verifyNoMoreInteractions(authorRepository);
+    }
+
+    @Test(expected = ResourceNotFoundException.class)
+    public void should_fail_while_finding_author_at_random_when_there_is_no_author() {
+        //given
+        final Author author;
+
+        //when
+        when(authorRepository.count()).thenReturn(0L);
+        author = authorService.findAtRandom();
+
+        //then
+        assertNull(author);
+        verify(authorRepository, times(1)).count();
         verifyNoMoreInteractions(authorRepository);
     }
 }
