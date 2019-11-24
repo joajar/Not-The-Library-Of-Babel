@@ -40,7 +40,7 @@ public class AuthorServiceImplTest {
         final List<Author> authors;
 
         //when
-        when(authorService.saveAll(Arrays.asList(Horstmann, Bloch))).thenReturn(Arrays.asList(Horstmann, Bloch));
+        when(authorRepository.saveAll(Arrays.asList(Horstmann, Bloch))).thenReturn(Arrays.asList(Horstmann, Bloch));
         authors = authorService.saveAll(Arrays.asList(Horstmann, Bloch));
 
         //then
@@ -133,4 +133,5 @@ public class AuthorServiceImplTest {
         verify(authorRepository, times(1)).count();
         verifyNoMoreInteractions(authorRepository);
     }
+
 }

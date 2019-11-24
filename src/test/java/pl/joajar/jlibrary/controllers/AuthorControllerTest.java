@@ -124,4 +124,17 @@ public class AuthorControllerTest {
         verify(authorService, times(1)).findAtRandom();
         verifyNoMoreInteractions(authorService);
     }
+
+    @Test
+    public void should_fail_while_getting_at_random_when_there_is_no_author_at_the_database() throws Exception {
+        //when
+        when(authorService.findAtRandom()).thenThrow(ResourceNotFoundException.class);
+
+        //then
+        mockMvc.perform(get("/v1/library/authors/random").accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isNotFound());
+
+        verify(authorService, times(1)).findAtRandom();
+        verifyNoMoreInteractions(authorService);
+    }
 }
