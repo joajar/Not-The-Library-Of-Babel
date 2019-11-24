@@ -1,9 +1,7 @@
 package pl.joajar.jlibrary.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
@@ -15,7 +13,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
+@AllArgsConstructor(access = AccessLevel.PACKAGE)
 @ToString
+@Getter
+@Builder
 @Entity
 @Table(name="books")
 public class Book {
@@ -38,17 +39,30 @@ public class Book {
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
     @JsonBackReference
-    private Set<BookAuthorship> bookAuthorshipSet;
+    private Set<Relation> relationSet;
 
-    public Book(String title, String isbn, LocalDate publicationDate, BookAuthorship... bookAuthorshipSet) {
+    public Book(String title, String isbn, LocalDate publicationDate, Relation... relationSet) {
 
         this.title = title;
         this.isbn = isbn;
         this.publicationDate = publicationDate;
 
-        for (BookAuthorship bookAuthorship : bookAuthorshipSet)
-            bookAuthorship.setBook(this);
+        for (Relation relation : relationSet)
+            relation.setBook(this);
 
-        this.bookAuthorshipSet = Stream.of(bookAuthorshipSet).collect(Collectors.toSet());
+        this.relationSet = Stream.of(relationSet).collect(Collectors.toSet());
+    }
+
+    public Book(Long id, String title, String isbn, LocalDate publicationDate, Relation... relationSet) {
+
+        this.id = id;
+        this.title = title;
+        this.isbn = isbn;
+        this.publicationDate = publicationDate;
+
+        for (Relation relation : relationSet)
+            relation.setBook(this);
+
+        this.relationSet = Stream.of(relationSet).collect(Collectors.toSet());
     }
 }

@@ -6,7 +6,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import pl.joajar.jlibrary.domain.Author;
 import pl.joajar.jlibrary.domain.Book;
-import pl.joajar.jlibrary.domain.BookAuthorship;
+import pl.joajar.jlibrary.domain.Relation;
 import pl.joajar.jlibrary.services.AuthorService;
 import pl.joajar.jlibrary.services.BookService;
 
@@ -41,26 +41,26 @@ public class AnnotationDrivenContextStartedListener {
 
         bookService.save(
                 new Book("Java. Podstawy. Wydanie X", "9788328324800", LocalDate.of(2016, 9, 26),
-                        new BookAuthorship(Horstmann)));
+                        new Relation(Horstmann)));
 
         bookService.save(
                 new Book("Java. Techniki zaawansowane. Wydanie X", "9788328334809", LocalDate.of(2017, 9, 28),
-                        new BookAuthorship(Horstmann)));
+                        new Relation(Horstmann)));
 
         bookService.save(
                 new Book("Java Persistence. Programowanie aplikacji bazodanowych w Hibernate. Wydanie II",  "9788328327832", LocalDate.of(2016, 12, 13),
-                        new BookAuthorship(Bauer), new BookAuthorship(King), new BookAuthorship(Gregory)));
+                        new Relation(Bauer), new Relation(King), new Relation(Gregory)));
 
         bookService.save(
                 new Book("Java. Efektywne programowanie. Wydanie III", "9788328345775", LocalDate.of(2018, 8, 17),
-                        new BookAuthorship(Bloch)));
+                        new Relation(Bloch)));
 
         bookService.save(
                 new Book("Spring in Action, Fifth Edition", "9781617294945", LocalDate.of(2019, 10, 1),
-                        new BookAuthorship(Walls)));
+                        new Relation(Walls)));
 
         bookService.save(
                 new Book(bookTitle, "9788328306448", LocalDate.of(2015, 6, 16),
-                        new BookAuthorship(Mehta)));
+                        new Relation(Mehta)));
     }
 }

@@ -13,7 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import pl.joajar.jlibrary.domain.Author;
-import pl.joajar.jlibrary.dto.AuthorDTO;
+import pl.joajar.jlibrary.dto.AuthorCreateDTO;
 import pl.joajar.jlibrary.exceptions.DuplicateResourceException;
 import pl.joajar.jlibrary.exceptions.LibraryExceptionHandler;
 import pl.joajar.jlibrary.exceptions.NullDataProvidedException;
@@ -145,10 +145,10 @@ public class AuthorControllerTest {
     public void should_post_author() throws Exception {
         //given
         final Author Bloch = Author.builder().id(1L).firstName("Joshua").lastName("Bloch").build();
-        final AuthorDTO BlochDTO = AuthorDTO.builder().firstName("Joshua").lastName("Bloch").build();
+        final AuthorCreateDTO BlochDTO = AuthorCreateDTO.builder().firstName("Joshua").lastName("Bloch").build();
 
         //when
-        when(authorService.save(any(AuthorDTO.class))).thenReturn(Bloch);
+        when(authorService.save(any(AuthorCreateDTO.class))).thenReturn(Bloch);
 
         //then
         mockMvc.perform(
@@ -165,17 +165,17 @@ public class AuthorControllerTest {
                 .andExpect(jsonPath("$.lastName").value(Matchers.is(BlochDTO.getLastName())))
         ;// ; put in the last line in order to allow work on particular lines of the test separately, similarly as in SQL
 
-        verify(authorService, times(1)).save(any(AuthorDTO.class));
+        verify(authorService, times(1)).save(any(AuthorCreateDTO.class));
         verifyNoMoreInteractions(authorService);
     }
 
     @Test
     public void should_fail_while_posting_author_that_exists_in_the_db() throws Exception {
         //given
-        final AuthorDTO BlochDTO = AuthorDTO.builder().firstName("Joshua").lastName("Bloch").build();
+        final AuthorCreateDTO BlochDTO = AuthorCreateDTO.builder().firstName("Joshua").lastName("Bloch").build();
 
         //when
-        when(authorService.save(any(AuthorDTO.class))).thenThrow(DuplicateResourceException.class);
+        when(authorService.save(any(AuthorCreateDTO.class))).thenThrow(DuplicateResourceException.class);
 
         //then
         mockMvc.perform(
@@ -186,7 +186,7 @@ public class AuthorControllerTest {
                 .andExpect(status().isConflict())
         ;
 
-        verify(authorService, times(1)).save(any(AuthorDTO.class));
+        verify(authorService, times(1)).save(any(AuthorCreateDTO.class));
         verifyNoMoreInteractions(authorService);
     }
 
@@ -194,10 +194,10 @@ public class AuthorControllerTest {
     public void should_update_all_author_attributes() throws Exception {
         //given
         final Author Bloch = Author.builder().id(14L).firstName("Joshua").lastName("Bloch").build();
-        final AuthorDTO BlochDTO = AuthorDTO.builder().firstName("Joshua").lastName("Bloch").build();
+        final AuthorCreateDTO BlochDTO = AuthorCreateDTO.builder().firstName("Joshua").lastName("Bloch").build();
 
         //when
-        when(authorService.updateAttributesThenSave(anyLong(), any(AuthorDTO.class))).thenReturn(Bloch);
+        when(authorService.updateAttributesThenSave(anyLong(), any(AuthorCreateDTO.class))).thenReturn(Bloch);
 
         //then
         mockMvc.perform(
@@ -213,17 +213,17 @@ public class AuthorControllerTest {
                 .andExpect(jsonPath("$.lastName").value(Matchers.is(Bloch.getLastName())))
         ;
 
-        verify(authorService, times(1)).updateAttributesThenSave(anyLong(), any(AuthorDTO.class));
+        verify(authorService, times(1)).updateAttributesThenSave(anyLong(), any(AuthorCreateDTO.class));
         verifyNoMoreInteractions(authorService);
     }
 
     @Test
     public void should_fail_while_patching_author_that_exists_in_the_db() throws Exception {
         //given
-        final AuthorDTO BlochDTO = AuthorDTO.builder().firstName("Joshua").lastName("Bloch").build();
+        final AuthorCreateDTO BlochDTO = AuthorCreateDTO.builder().firstName("Joshua").lastName("Bloch").build();
 
         //when
-        when(authorService.updateAttributesThenSave(anyLong(), any(AuthorDTO.class))).thenThrow(ResourceNotFoundException.class);
+        when(authorService.updateAttributesThenSave(anyLong(), any(AuthorCreateDTO.class))).thenThrow(ResourceNotFoundException.class);
 
         //then
         mockMvc.perform(
@@ -234,7 +234,7 @@ public class AuthorControllerTest {
                 .andExpect(status().isNotFound())
         ;
 
-        verify(authorService, times(1)).updateAttributesThenSave(anyLong(), any(AuthorDTO.class));
+        verify(authorService, times(1)).updateAttributesThenSave(anyLong(), any(AuthorCreateDTO.class));
         verifyNoMoreInteractions(authorService);
     }
 
@@ -242,10 +242,10 @@ public class AuthorControllerTest {
     public void should_update_author_while_putting() throws Exception {
         //given
         final Author Bloch = Author.builder().id(14L).firstName("Joshua").lastName("Bloch").build();
-        final AuthorDTO BlochDTO = AuthorDTO.builder().firstName("Joshua").lastName("Bloch").build();
+        final AuthorCreateDTO BlochDTO = AuthorCreateDTO.builder().firstName("Joshua").lastName("Bloch").build();
 
         //when
-        when(authorService.updateAuthorThenSave(anyLong(), any(AuthorDTO.class))).thenReturn(Bloch);
+        when(authorService.updateAuthorThenSave(anyLong(), any(AuthorCreateDTO.class))).thenReturn(Bloch);
 
         //then
         mockMvc.perform(
@@ -261,17 +261,17 @@ public class AuthorControllerTest {
                 .andExpect(jsonPath("$.lastName").value(Matchers.is(Bloch.getLastName())))
         ;
 
-        verify(authorService, times(1)).updateAuthorThenSave(anyLong(), any(AuthorDTO.class));
+        verify(authorService, times(1)).updateAuthorThenSave(anyLong(), any(AuthorCreateDTO.class));
         verifyNoMoreInteractions(authorService);
     }
 
     @Test
     public void should_fail_while_putting_author_that_exists_in_the_db() throws Exception {
         //given
-        final AuthorDTO BlochDTO = AuthorDTO.builder().firstName("Joshua").lastName("Bloch").build();
+        final AuthorCreateDTO BlochDTO = AuthorCreateDTO.builder().firstName("Joshua").lastName("Bloch").build();
 
         //when
-        when(authorService.updateAuthorThenSave(anyLong(), any(AuthorDTO.class))).thenThrow(ResourceNotFoundException.class);
+        when(authorService.updateAuthorThenSave(anyLong(), any(AuthorCreateDTO.class))).thenThrow(ResourceNotFoundException.class);
 
         //then
         mockMvc.perform(
@@ -282,17 +282,17 @@ public class AuthorControllerTest {
                 .andExpect(status().isNotFound())
         ;
 
-        verify(authorService, times(1)).updateAuthorThenSave(anyLong(), any(AuthorDTO.class));
+        verify(authorService, times(1)).updateAuthorThenSave(anyLong(), any(AuthorCreateDTO.class));
         verifyNoMoreInteractions(authorService);
     }
 
     @Test
     public void should_fail_while_putting_author_and_obtaining_empty_firstName() throws Exception {
         //given
-        final AuthorDTO BlochDTO = AuthorDTO.builder().firstName("").lastName("Bloch").build();
+        final AuthorCreateDTO BlochDTO = AuthorCreateDTO.builder().firstName("").lastName("Bloch").build();
 
         //when
-        when(authorService.updateAuthorThenSave(anyLong(), any(AuthorDTO.class))).thenThrow(NullDataProvidedException.class);
+        when(authorService.updateAuthorThenSave(anyLong(), any(AuthorCreateDTO.class))).thenThrow(NullDataProvidedException.class);
 
         //then
         mockMvc.perform(
@@ -303,7 +303,7 @@ public class AuthorControllerTest {
                 .andExpect(status().isNotAcceptable())
         ;
 
-        verify(authorService, times(1)).updateAuthorThenSave(anyLong(), any(AuthorDTO.class));
+        verify(authorService, times(1)).updateAuthorThenSave(anyLong(), any(AuthorCreateDTO.class));
         verifyNoMoreInteractions(authorService);
     }
 

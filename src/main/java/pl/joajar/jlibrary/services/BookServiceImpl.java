@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import pl.joajar.jlibrary.domain.Book;
 import pl.joajar.jlibrary.repository.BookRepository;
 
+import java.util.List;
+
 @Service
 public class BookServiceImpl implements BookService {
     private BookRepository bookRepository;
@@ -17,5 +19,10 @@ public class BookServiceImpl implements BookService {
     @Override
     public Book save(Book book) {
         return bookRepository.save(book);
+    }
+
+    @Override
+    public List<Book> findAll() {
+        return bookRepository.findAll();
     }
 }

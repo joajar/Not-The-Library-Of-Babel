@@ -8,7 +8,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import pl.joajar.jlibrary.domain.Author;
-import pl.joajar.jlibrary.dto.AuthorDTO;
+import pl.joajar.jlibrary.dto.AuthorCreateDTO;
 import pl.joajar.jlibrary.exceptions.DuplicateResourceException;
 import pl.joajar.jlibrary.exceptions.NullDataProvidedException;
 import pl.joajar.jlibrary.exceptions.ResourceNotFoundException;
@@ -141,7 +141,7 @@ public class AuthorServiceImplTest {
     public void should_save_new_author() {
         //given
         final Author Walls = Author.builder().id(6L).firstName("Craig").lastName("Walls").build();
-        final AuthorDTO WallsDTO = AuthorDTO.builder().firstName("Craig").lastName("Walls").build();
+        final AuthorCreateDTO WallsDTO = AuthorCreateDTO.builder().firstName("Craig").lastName("Walls").build();
         final Author author;
 
         //when
@@ -160,7 +160,7 @@ public class AuthorServiceImplTest {
     @Test(expected = DuplicateResourceException.class)
     public void should_fail_while_saving_author_that_exists() {
         //given
-        AuthorDTO WallsDTO = AuthorDTO.builder().firstName("Craig").lastName("Walls").build();
+        AuthorCreateDTO WallsDTO = AuthorCreateDTO.builder().firstName("Craig").lastName("Walls").build();
         final Author author;
 
         //when
@@ -180,9 +180,9 @@ public class AuthorServiceImplTest {
         final Author Horstmann_to_check_updating_firstName = Author.builder().id(12L).firstName("Cay S.").lastName("Horstmann").build();
         final Author Horstmann_to_check_updating_lastName = Author.builder().id(13L).firstName("Cay S.").lastName("Horstmann").build();
 
-        final AuthorDTO WallsDTO_to_check_updating_all_attributes = AuthorDTO.builder().firstName("Craig").lastName("Walls").build();
-        final AuthorDTO WallsDTO_to_check_updating_firstName = AuthorDTO.builder().firstName("Craig").lastName("").build();
-        final AuthorDTO WallsDTO_to_check_updating_lastName = AuthorDTO.builder().firstName("").lastName("Walls").build();
+        final AuthorCreateDTO WallsDTO_to_check_updating_all_attributes = AuthorCreateDTO.builder().firstName("Craig").lastName("Walls").build();
+        final AuthorCreateDTO WallsDTO_to_check_updating_firstName = AuthorCreateDTO.builder().firstName("Craig").lastName("").build();
+        final AuthorCreateDTO WallsDTO_to_check_updating_lastName = AuthorCreateDTO.builder().firstName("").lastName("Walls").build();
 
         final Author author_to_check_updating_all_attributes, author_to_check_updating_firstName, author_to_check_updating_lastName;
 
@@ -221,7 +221,7 @@ public class AuthorServiceImplTest {
         //given
         final Author Bloch = Author.builder().id(11L).firstName("Joshua").lastName("Bloch").build();
 
-        final AuthorDTO WallsDTO = AuthorDTO.builder().firstName("Craig").lastName("Walls").build();
+        final AuthorCreateDTO WallsDTO = AuthorCreateDTO.builder().firstName("Craig").lastName("Walls").build();
 
         final Author author;
 
@@ -241,7 +241,7 @@ public class AuthorServiceImplTest {
         //given
         final Author Bloch = Author.builder().id(11L).firstName("Joshua").lastName("Bloch").build();
 
-        final AuthorDTO WallsDTO = AuthorDTO.builder().firstName("").lastName("Walls").build();
+        final AuthorCreateDTO WallsDTO = AuthorCreateDTO.builder().firstName("").lastName("Walls").build();
 
         final Author author;
 
@@ -258,7 +258,7 @@ public class AuthorServiceImplTest {
         //given
         final Author Bloch = Author.builder().id(11L).firstName("Joshua").lastName("Bloch").build();
 
-        final AuthorDTO WallsDTO = AuthorDTO.builder().firstName("Craig").lastName("").build();
+        final AuthorCreateDTO WallsDTO = AuthorCreateDTO.builder().firstName("Craig").lastName("").build();
 
         final Author author;
 

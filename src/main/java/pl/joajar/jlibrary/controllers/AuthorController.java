@@ -9,7 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.joajar.jlibrary.domain.Author;
-import pl.joajar.jlibrary.dto.AuthorDTO;
+import pl.joajar.jlibrary.dto.AuthorCreateDTO;
 import pl.joajar.jlibrary.services.AuthorService;
 
 import javax.validation.Valid;
@@ -46,24 +46,24 @@ public class AuthorController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Author> postAuthor(@RequestBody @Valid AuthorDTO authorDTO) {
+    public ResponseEntity<Author> postAuthor(@RequestBody @Valid AuthorCreateDTO authorCreateDTO) {
         LOG.info("AuthorController.postAuthor: posting the author with the first name {} and the last name {}.",
-                authorDTO.getFirstName(), authorDTO.getLastName());
-        return new ResponseEntity<>(authorService.save(authorDTO), HttpStatus.CREATED);
+                authorCreateDTO.getFirstName(), authorCreateDTO.getLastName());
+        return new ResponseEntity<>(authorService.save(authorCreateDTO), HttpStatus.CREATED);
     }
 
     //For usage when *some* new properties (firstName or lastName) are null, and only non-null properties are replacing the old ones
     @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Author> patchAuthor(@PathVariable("id") Long id, @RequestBody @NonNull AuthorDTO authorDTO) {
+    public ResponseEntity<Author> patchAuthor(@PathVariable("id") Long id, @RequestBody @NonNull AuthorCreateDTO authorCreateDTO) {
         LOG.info("AuthorController.patchAuthor: updating all attributes of the author with id = {} (possibly some attributes only).", id);
-        return new ResponseEntity<>(authorService.updateAttributesThenSave(id, authorDTO), HttpStatus.OK);
+        return new ResponseEntity<>(authorService.updateAttributesThenSave(id, authorCreateDTO), HttpStatus.OK);
     }
 
     //For usage in case *all* new properties (firstName, lastName) are non-null, and have to replace the old ones
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Author> putAuthor(@PathVariable("id") Long id, @RequestBody @NonNull AuthorDTO authorDTO) {
+    public ResponseEntity<Author> putAuthor(@PathVariable("id") Long id, @RequestBody @NonNull AuthorCreateDTO authorCreateDTO) {
         LOG.info("AuthorController.putAuthor: updating the author with id = {}.", id);
-        return new ResponseEntity<>(authorService.updateAuthorThenSave(id, authorDTO), HttpStatus.OK);
+        return new ResponseEntity<>(authorService.updateAuthorThenSave(id, authorCreateDTO), HttpStatus.OK);
     }
 
     //Below you may find the idea of HttpStatus.NO_CONTENT usage and customerService.deleteAuthor taken from Walls' book "Spring in Action, 5ed", p.148

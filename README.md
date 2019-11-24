@@ -1,4 +1,5 @@
-#Not-The-Library-Of-Babel (under construction)
+
+# Not-The-Library-Of-Babel (under construction)
 
 Do you know Borges' _Library of Babel_? 
 If not then read what's his diabolically mathematical 😈 library: <br>
@@ -19,6 +20,14 @@ I've ensured earlier that my application works.
 The following endpoints are available on Heroku so far 
 (the project isn't completed yet):
 <ul>
+<li>
+get all the books (together with their authors)
+from my library &minus; the output is made using 
+many-to-many relation between books and authors
+that is implemented in my project:
+
+`https://heroku-library.herokuapp.com/v1/library/catalog`
+</li>
 <li>
 get the list of all authors that wrote a book appearing in my library:
 

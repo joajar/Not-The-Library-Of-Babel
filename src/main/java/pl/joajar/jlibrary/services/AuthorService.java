@@ -1,7 +1,7 @@
 package pl.joajar.jlibrary.services;
 
 import pl.joajar.jlibrary.domain.Author;
-import pl.joajar.jlibrary.dto.AuthorDTO;
+import pl.joajar.jlibrary.dto.AuthorCreateDTO;
 import pl.joajar.jlibrary.exceptions.DuplicateResourceException;
 import pl.joajar.jlibrary.exceptions.NullDataProvidedException;
 import pl.joajar.jlibrary.exceptions.ResourceNotFoundException;
@@ -17,15 +17,15 @@ public interface AuthorService {
 
     Author findAtRandom() throws ResourceNotFoundException;
 
-    Author save(AuthorDTO authorDTO) throws DuplicateResourceException;
+    Author save(AuthorCreateDTO authorCreateDTO) throws DuplicateResourceException;
 
-    Author updateAttributesOfAuthorFound(Author author, AuthorDTO authorDTO);
+    Author updateAttributesOfAuthorFound(Author author, AuthorCreateDTO authorCreateDTO);
 
-    Author updateAttributesThenSave(Long id, AuthorDTO authorDTO) throws ResourceNotFoundException;
+    Author updateAttributesThenSave(Long id, AuthorCreateDTO authorCreateDTO) throws ResourceNotFoundException;
 
-    Author updateFoundAuthor(Author author, AuthorDTO authorDTO) throws NullDataProvidedException;
+    Author updateFoundAuthor(Author author, AuthorCreateDTO authorCreateDTO) throws NullDataProvidedException;
 
-    Author updateAuthorThenSave(Long anyLong, AuthorDTO authorDTO) throws ResourceNotFoundException, NullDataProvidedException;
+    Author updateAuthorThenSave(Long anyLong, AuthorCreateDTO authorCreateDTO) throws ResourceNotFoundException, NullDataProvidedException;
 
     void delete(Long id);
 }

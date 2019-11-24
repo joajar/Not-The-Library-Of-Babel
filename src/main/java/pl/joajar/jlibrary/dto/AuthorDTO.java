@@ -3,11 +3,15 @@ package pl.joajar.jlibrary.dto;
 import lombok.*;
 
 @NoArgsConstructor
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Getter
 @Setter
-@Builder
-public class AuthorDTO {
+public class AuthorDTO extends AuthorCreateDTO {
     @NonNull
-    private String firstName, lastName;
+    private Long id;
+
+    public AuthorDTO(String firstName, String lastName, Long id) {
+        super(firstName, lastName);
+        this.id = id;
+    }
 }

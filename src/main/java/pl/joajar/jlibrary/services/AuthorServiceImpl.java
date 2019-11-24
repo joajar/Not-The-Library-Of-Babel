@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.joajar.jlibrary.domain.Author;
-import pl.joajar.jlibrary.dto.AuthorDTO;
+import pl.joajar.jlibrary.dto.AuthorCreateDTO;
 import pl.joajar.jlibrary.exceptions.DuplicateResourceException;
 import pl.joajar.jlibrary.exceptions.NullDataProvidedException;
 import pl.joajar.jlibrary.exceptions.ResourceNotFoundException;
@@ -55,28 +55,28 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
-    public Author save(AuthorDTO authorDTO) throws DuplicateResourceException {
-        if (authorRepository.findByFirstNameAndLastName(authorDTO.getFirstName(), authorDTO.getLastName()).isPresent())
+    public Author save(AuthorCreateDTO authorCreateDTO) throws DuplicateResourceException {
+        if (authorRepository.findByFirstNameAndLastName(authorCreateDTO.getFirstName(), authorCreateDTO.getLastName()).isPresent())
         {
-            throw new DuplicateResourceException(authorDTO.getFirstName(), authorDTO.getLastName());
+            throw new DuplicateResourceException(authorCreateDTO.getFirstName(), authorCreateDTO.getLastName());
         }
-        Author author = authorRepository.save(new Author(authorDTO.getFirstName(), authorDTO.getLastName()));
+        Author author = authorRepository.save(new Author(authorCreateDTO.getFirstName(), authorCreateDTO.getLastName()));
         LOG.info("AuthorServiceImpl.save: saving under id = {} the author with the first name {} and the last name {}.",
                 author.getId(), author.getFirstName(), author.getLastName());
         return author;
     }
 
     @Override
-    public Author updateAttributesOfAuthorFound(Author author, AuthorDTO authorDTO) {
+    public Author updateAttributesOfAuthorFound(Author author, AuthorCreateDTO authorCreateDTO) {
 
         author.setFirstName(
-                Optional.ofNullable(authorDTO.getFirstName())
+                Optional.ofNullable(authorCreateDTO.getFirstName())
                         .filter(firstName -> firstName.length() > 0)
                         .orElse(author.getFirstName())
         );
 
         author.setLastName(
-                Optional.ofNullable(authorDTO.getLastName())
+                Optional.ofNullable(authorCreateDTO.getLastName())
                         .filter(lastName -> lastName.length() > 0)
                         .orElse(author.getLastName())
         );
@@ -86,24 +86,24 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
-    public Author updateAttributesThenSave(Long id, AuthorDTO authorDTO) throws ResourceNotFoundException {
+    public Author updateAttributesThenSave(Long id, AuthorCreateDTO authorCreateDTO) throws ResourceNotFoundException {
 
         Author author = findById(id);
 
-        return authorRepository.save(updateAttributesOfAuthorFound(author, authorDTO));
+        return authorRepository.save(updateAttributesOfAuthorFound(author, authorCreateDTO));
     }
 
     @Override
-    public Author updateFoundAuthor(Author author, AuthorDTO authorDTO) throws NullDataProvidedException {
+    public Author updateFoundAuthor(Author author, AuthorCreateDTO authorCreateDTO) throws NullDataProvidedException {
 
         author.setFirstName(
-                Optional.ofNullable(authorDTO.getFirstName())
+                Optional.ofNullable(authorCreateDTO.getFirstName())
                         .filter(firstName -> firstName.length() > 0)
                         .orElseThrow(NullDataProvidedException::new)
         );
 
         author.setLastName(
-                Optional.ofNullable(authorDTO.getLastName())
+                Optional.ofNullable(authorCreateDTO.getLastName())
                         .filter(lastName -> lastName.length() > 0)
                         .orElseThrow(NullDataProvidedException::new)
         );
@@ -113,11 +113,11 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
-    public Author updateAuthorThenSave(Long id, AuthorDTO authorDTO) throws ResourceNotFoundException, NullDataProvidedException {
+    public Author updateAuthorThenSave(Long id, AuthorCreateDTO authorCreateDTO) throws ResourceNotFoundException, NullDataProvidedException {
 
         Author author = findById(id);
 
-        return authorRepository.save(updateFoundAuthor(author, authorDTO));
+        return authorRepository.save(updateFoundAuthor(author, authorCreateDTO));
     }
 
     @Override

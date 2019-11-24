@@ -33,7 +33,7 @@ public class Author {
     @JsonBackReference
 //    see: https://stackoverflow.com/questions/3325387/infinite-recursion-with-jackson-json-and-hibernate-jpa-issue
 //    https://www.baeldung.com/jackson-bidirectional-relationships-and-infinite-recursion
-    private Set<BookAuthorship> bookAuthorshipSet;
+    private Set<Relation> relationSet;
 
     public Author(String firstName, String lastName) {
         this.firstName = firstName;
