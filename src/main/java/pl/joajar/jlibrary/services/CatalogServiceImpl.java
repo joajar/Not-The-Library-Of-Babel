@@ -29,7 +29,7 @@ public class CatalogServiceImpl implements CatalogService {
         this.relationService = relationService;
     }
     @Override
-    public List<BookWithAuthorSetDTO> getBooksCatalog() {
+    public List<BookWithAuthorSetDTO> getBooksCatalog() throws ResourceNotFoundException {
 
         if (bookService.findAll() == null || bookService.findAll().size() == 0) {
             LOG.warn("Database error: there is no books!");
@@ -38,33 +38,41 @@ public class CatalogServiceImpl implements CatalogService {
 
         List<BookWithAuthorSetDTO> bookWithAuthorSetDTOList = new ArrayList<>();
 
-        for (Book book : bookService.findAll()) {
-
-            BookWithAuthorSetDTO bookWithAuthorSetDTO = new BookWithAuthorSetDTO();
-
-            bookWithAuthorSetDTO.setId(book.getId());
-            bookWithAuthorSetDTO.setTitle(book.getTitle());
-            bookWithAuthorSetDTO.setPublicationDate(book.getPublicationDate());
-            bookWithAuthorSetDTO.setIsbn(book.getIsbn());
-
-            if (relationService.findRelationByBookId(book.getId()) == null || relationService.findRelationByBookId(book.getId()).size() == 0) {
-                LOG.warn("Database error: there is no authors for the book with id = {}.", book.getId());
-                throw new ResourceNotFoundException("Database error: there is no authors for the book with id = " + book.getId() + ".");
-            }
-
-            Set<AuthorDTO> authorSet = new HashSet<>();
-
-            for (Relation relation : relationService.findRelationByBookId(book.getId())) {
-                Author author = relation.getAuthor();
-                AuthorDTO authorDTO = new AuthorDTO(author.getFirstName(), author.getLastName(), author.getId());
-                authorSet.add(authorDTO);
-            }
-
-            bookWithAuthorSetDTO.setAuthorSet(authorSet);
-
-            bookWithAuthorSetDTOList.add(bookWithAuthorSetDTO);
-        }
+        for (Book book : bookService.findAll())
+            bookWithAuthorSetDTOList.add(prepareBookWithAuthorSetDTO(book));
 
         return bookWithAuthorSetDTOList;
     }
+
+    @Override
+    public BookWithAuthorSetDTO findBookByBookId(Long id) throws ResourceNotFoundException {
+        return prepareBookWithAuthorSetDTO(bookService.findById(id));
+    }
+
+    private BookWithAuthorSetDTO prepareBookWithAuthorSetDTO(Book book) throws ResourceNotFoundException {
+        BookWithAuthorSetDTO bookWithAuthorSetDTO = new BookWithAuthorSetDTO();
+
+        bookWithAuthorSetDTO.setId(book.getId());
+        bookWithAuthorSetDTO.setTitle(book.getTitle());
+        bookWithAuthorSetDTO.setPublicationDate(book.getPublicationDate());
+        bookWithAuthorSetDTO.setIsbn(book.getIsbn());
+
+        if (relationService.findRelationByBookId(book.getId()) == null || relationService.findRelationByBookId(book.getId()).size() == 0) {
+            LOG.warn("Database error: there is no authors for the book with id = {}.", book.getId());
+            throw new ResourceNotFoundException("Database error: there is no authors for the book with id = " + book.getId() + ".");
+        }
+
+        Set<AuthorDTO> authorSet = new HashSet<>();
+
+        for (Relation relation : relationService.findRelationByBookId(book.getId())) {
+            Author author = relation.getAuthor();
+            AuthorDTO authorDTO = new AuthorDTO(author.getFirstName(), author.getLastName(), author.getId());
+            authorSet.add(authorDTO);
+        }
+
+        bookWithAuthorSetDTO.setAuthorSet(authorSet);
+
+        return bookWithAuthorSetDTO;
+    }
 }
+
