@@ -9,7 +9,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import pl.joajar.jlibrary.dto.AuthorDTO;
 import pl.joajar.jlibrary.dto.BookWithAuthorSetDTO;
@@ -25,8 +24,7 @@ import java.util.stream.Stream;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CatalogControllerTest {
@@ -70,7 +68,7 @@ public class CatalogControllerTest {
         //then
         mockMvc.perform(get("/v1/library/catalog"))
                 .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$", hasSize(3)))
                 .andExpect(jsonPath("$[0].id").exists())
                 .andExpect(jsonPath("$[0].id").value(Matchers.is(1)))
@@ -78,10 +76,51 @@ public class CatalogControllerTest {
                 .andExpect(jsonPath("$[0].isbn").value(Matchers.is("9788328324800")))
                 .andExpect(jsonPath("$[0].authorSet").exists())
                 .andExpect(jsonPath("$[0].authorSet", hasSize(1)))
+                .andExpect(jsonPath("$[1].id").exists())
+                .andExpect(jsonPath("$[1].id").value(Matchers.is(2)))
+                .andExpect(jsonPath("$[1].title").value(Matchers.is("Java. Techniki zaawansowane. Wydanie X")))
+                .andExpect(jsonPath("$[1].isbn").value(Matchers.is("9788328334809")))
+                .andExpect(jsonPath("$[1].authorSet").exists())
+                .andExpect(jsonPath("$[1].authorSet", hasSize(1)))
+                .andExpect(jsonPath("$[2].id").exists())
+                .andExpect(jsonPath("$[2].id").value(Matchers.is(3)))
+                .andExpect(jsonPath("$[2].title").value(Matchers.is("Java Persistence. Programowanie aplikacji bazodanowych w Hibernate. Wydanie II")))
+                .andExpect(jsonPath("$[2].isbn").value(Matchers.is("9788328327832")))
+                .andExpect(jsonPath("$[2].authorSet").exists())
                 .andExpect(jsonPath("$[2].authorSet", hasSize(3)))
         ;
 
         verify(catalogService, times(1)).getBooksCatalog();
+        verifyNoMoreInteractions(catalogService);
+    }
+
+    @Test
+    public void should_get_book_by_id() throws Exception {
+        //given
+        AuthorDTO BauerDTO = new AuthorDTO("Christian", "Bauer", 2L);
+        AuthorDTO KingDTO = new AuthorDTO("Gavin", "King", 3L);
+        AuthorDTO GregoryDTO = new AuthorDTO("Gary", "Gregory", 4L);
+
+        BookWithAuthorSetDTO Hibernate = BookWithAuthorSetDTO.builder().id(3L).title("Java Persistence. Programowanie aplikacji bazodanowych w Hibernate. Wydanie II").isbn("9788328327832")
+                .publicationDate(LocalDate.of(2016, 12, 13))
+                .authorSet(Stream.of(BauerDTO, KingDTO, GregoryDTO).collect(Collectors.toSet())).build();
+
+        //when
+        when(catalogService.findBookByBookId(3L)).thenReturn(Hibernate);
+
+        //then
+        mockMvc.perform(get("/v1/library/catalog/{id}", 3).accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.id").value(Matchers.is(3)))
+                .andExpect(jsonPath("$.title").value(Matchers.is("Java Persistence. Programowanie aplikacji bazodanowych w Hibernate. Wydanie II")))
+                .andExpect(jsonPath("$.isbn").value(Matchers.is("9788328327832")))
+                .andExpect(jsonPath("$.authorSet").exists())
+                .andExpect(jsonPath("$.authorSet", hasSize(3)))
+        ;
+
+        verify(catalogService, times(1)).findBookByBookId(3L);
         verifyNoMoreInteractions(catalogService);
     }
 }

@@ -28,12 +28,13 @@ public class CatalogServiceImpl implements CatalogService {
         this.bookService = bookService;
         this.relationService = relationService;
     }
+
     @Override
     public List<BookWithAuthorSetDTO> getBooksCatalog() throws ResourceNotFoundException {
 
         if (bookService.findAll() == null || bookService.findAll().size() == 0) {
-            LOG.warn("Database error: there is no books!");
-            throw new ResourceNotFoundException("Database error: there is no books!");
+            LOG.warn("CatalogServiceImpl.getBooksCatalog: there is no books!");
+            throw new ResourceNotFoundException("There is no books!");
         }
 
         List<BookWithAuthorSetDTO> bookWithAuthorSetDTOList = new ArrayList<>();
@@ -58,8 +59,8 @@ public class CatalogServiceImpl implements CatalogService {
         bookWithAuthorSetDTO.setIsbn(book.getIsbn());
 
         if (relationService.findRelationByBookId(book.getId()) == null || relationService.findRelationByBookId(book.getId()).size() == 0) {
-            LOG.warn("Database error: there is no authors for the book with id = {}.", book.getId());
-            throw new ResourceNotFoundException("Database error: there is no authors for the book with id = " + book.getId() + ".");
+            LOG.warn("CatalogServiceImpl.prepareBookWithAuthorSetDTO: there is no authors for the book with id = {}.", book.getId());
+            throw new ResourceNotFoundException("There is no authors for the book with id = " + book.getId() + ".");
         }
 
         Set<AuthorDTO> authorSet = new HashSet<>();
@@ -75,4 +76,3 @@ public class CatalogServiceImpl implements CatalogService {
         return bookWithAuthorSetDTO;
     }
 }
-
