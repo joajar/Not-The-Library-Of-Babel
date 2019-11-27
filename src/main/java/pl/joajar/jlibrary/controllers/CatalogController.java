@@ -38,4 +38,10 @@ public class CatalogController {
         LOG.info("CatalogController.getBookByBookId: finding the book with its authors.");
         return new ResponseEntity<>(catalogService.findBookByBookId(id), HttpStatus.OK);
     }
+
+    @GetMapping(value = "/random", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<BookWithAuthorSetDTO> getBookAtRandom() {
+        LOG.info("CatalogController.getBookAtRandom: finding a book at random.");
+        return new ResponseEntity<>(catalogService.findBookAtRandom(), HttpStatus.OK);
+    }
 }

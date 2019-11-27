@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import pl.joajar.jlibrary.dto.AuthorDTO;
 import pl.joajar.jlibrary.dto.BookWithAuthorSetDTO;
 import pl.joajar.jlibrary.exceptions.LibraryExceptionHandler;
+import pl.joajar.jlibrary.exceptions.ResourceNotFoundException;
 import pl.joajar.jlibrary.services.CatalogServiceImpl;
 
 import java.time.LocalDate;
@@ -118,9 +119,52 @@ public class CatalogControllerTest {
                 .andExpect(jsonPath("$.isbn").value(Matchers.is("9788328327832")))
                 .andExpect(jsonPath("$.authorSet").exists())
                 .andExpect(jsonPath("$.authorSet", hasSize(3)))
+        //.andExpect(jsonPath("$.authorSet[0].lastName").value(Matchers.is("King")))
         ;
 
         verify(catalogService, times(1)).findBookByBookId(3L);
+        verifyNoMoreInteractions(catalogService);
+    }
+
+    @Test
+    public void should_get_book_at_random() throws Exception {
+        //given
+        AuthorDTO BauerDTO = new AuthorDTO("Christian", "Bauer", 2L);
+        AuthorDTO KingDTO = new AuthorDTO("Gavin", "King", 3L);
+        AuthorDTO GregoryDTO = new AuthorDTO("Gary", "Gregory", 4L);
+
+        BookWithAuthorSetDTO Hibernate = BookWithAuthorSetDTO.builder().id(3L).title("Java Persistence. Programowanie aplikacji bazodanowych w Hibernate. Wydanie II").isbn("9788328327832")
+                .publicationDate(LocalDate.of(2016, 12, 13))
+                .authorSet(Stream.of(BauerDTO, KingDTO, GregoryDTO).collect(Collectors.toSet())).build();
+
+        //when
+        when(catalogService.findBookAtRandom()).thenReturn(Hibernate);
+
+        //then
+        mockMvc.perform(get("/v1/library/catalog/random").accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.id").value(Matchers.is(3)))
+                .andExpect(jsonPath("$.title").value(Matchers.is("Java Persistence. Programowanie aplikacji bazodanowych w Hibernate. Wydanie II")))
+                .andExpect(jsonPath("$.isbn").value(Matchers.is("9788328327832")))
+                .andExpect(jsonPath("$.authorSet").exists())
+                .andExpect(jsonPath("$.authorSet", hasSize(3)));
+
+        verify(catalogService, times(1)).findBookAtRandom();
+        verifyNoMoreInteractions(catalogService);
+    }
+
+    @Test
+    public void should_fail_while_getting_at_random_when_there_is_no_author_at_the_database() throws Exception {
+        //when
+        when(catalogService.findBookAtRandom()).thenThrow(ResourceNotFoundException.class);
+
+        //then
+        mockMvc.perform(get("/v1/library/catalog/random").accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isNotFound());
+
+        verify(catalogService, times(1)).findBookAtRandom();
         verifyNoMoreInteractions(catalogService);
     }
 }

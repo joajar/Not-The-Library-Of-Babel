@@ -28,7 +28,6 @@ public class CatalogServiceImpl implements CatalogService {
         this.bookService = bookService;
         this.relationService = relationService;
     }
-
     @Override
     public List<BookWithAuthorSetDTO> getBooksCatalog() throws ResourceNotFoundException {
 
@@ -74,5 +73,16 @@ public class CatalogServiceImpl implements CatalogService {
         bookWithAuthorSetDTO.setAuthorSet(authorSet);
 
         return bookWithAuthorSetDTO;
+    }
+
+    @Override
+    public BookWithAuthorSetDTO findBookAtRandom() throws ResourceNotFoundException {
+        long booksListSize = bookService.countBooks();
+
+        LOG.info("AuthorServiceImpl.findAtRandom: finding a book at random, out of {} books", booksListSize);
+
+        if (booksListSize == 0) throw new ResourceNotFoundException("There is no author at the database!");
+
+        return findBookByBookId((long) (Math.random() * booksListSize) + 1);
     }
 }

@@ -9,4 +9,6 @@ public interface CatalogService {
     List<BookWithAuthorSetDTO> getBooksCatalog() throws ResourceNotFoundException;
 
     BookWithAuthorSetDTO findBookByBookId(Long id) throws ResourceNotFoundException;
+
+    BookWithAuthorSetDTO findBookAtRandom() throws ResourceNotFoundException;
 }
