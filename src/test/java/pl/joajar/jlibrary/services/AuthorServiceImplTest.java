@@ -86,7 +86,7 @@ public class AuthorServiceImplTest {
     }
 
     @Test(expected = ResourceNotFoundException.class)
-    public void should_not_find_nonexistent_author_by_id() {
+    public void should_fail_while_finding_nonexistent_author_by_id() {
         //given
         final Author author;
 
@@ -133,5 +133,4 @@ public class AuthorServiceImplTest {
         verify(authorRepository, times(1)).count();
         verifyNoMoreInteractions(authorRepository);
     }
-
 }

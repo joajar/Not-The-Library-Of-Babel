@@ -29,6 +29,16 @@ that is implemented in my project:
 `https://heroku-library.herokuapp.com/v1/library/catalog`
 </li>
 <li>
+get some book (together with its authors) chosen at random:
+
+`https://heroku-library.herokuapp.com/v1/library/catalog/random`
+</li>
+<li>
+get the book (together with its authors) placed under (e.g.) id = 1:
+
+`https://heroku-library.herokuapp.com/v1/library/catalog/1`
+</li>
+<li>
 get the list of all authors that wrote a book appearing in my library:
 
 `https://heroku-library.herokuapp.com/v1/library/authors`

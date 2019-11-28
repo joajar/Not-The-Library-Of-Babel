@@ -21,8 +21,7 @@ import java.util.Arrays;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -79,7 +78,7 @@ public class AuthorControllerTest {
         when(authorService.findById(1L)).thenReturn(Bloch);
 
         //then
-        mockMvc.perform(get("/v1/library/authors/{id}", 1).accept(MediaType.APPLICATION_JSON_VALUE))
+        mockMvc.perform(get("/v1/library/authors/{id}", 1).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.id").exists())
@@ -92,7 +91,7 @@ public class AuthorControllerTest {
     }
 
     @Test
-    public void should_get_nonexistent_author_by_id_fail() throws Exception {
+    public void should_fail_while_getting_nonexistent_author() throws Exception {
         //when
         when(authorService.findById(anyLong())).thenThrow(ResourceNotFoundException.class);
 
@@ -100,7 +99,7 @@ public class AuthorControllerTest {
         mockMvc.perform(get("/v1/library/authors/{id}", 2).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
 
-        verify(authorService, times(1)).findById(2L);
+        verify(authorService, times(1)).findById(anyLong());
         verifyNoMoreInteractions(authorService);
     }
 

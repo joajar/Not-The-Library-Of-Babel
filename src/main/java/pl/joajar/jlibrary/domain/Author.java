@@ -21,7 +21,7 @@ public class Author {
     @Column(name = "id", nullable = false, updatable = false)
     private Long id;
 
-    @Pattern(regexp = "^[.\\u0119\\s\\p{Alnum}]{2,}$", message = "First name should consist of at least 2 signs, taken out of the set of all alphanumeric signs, space, full stop.")
+    @Pattern(regexp = "^[.\\u0119\\s\\p{Alnum}]{2,}$", message = "First name should consist of at least 2 signs, taken out of the set of all alphanumeric signs, and additionally the whitespace and the full stop.")
     @Column(name = "first_name")
     private String firstName;
 

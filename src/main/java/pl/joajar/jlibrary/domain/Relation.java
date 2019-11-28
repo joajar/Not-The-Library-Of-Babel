@@ -25,7 +25,7 @@ public class Relation implements Serializable {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "author_id") // = kolumna złączenia, klucz obcy; adnotacja przesłania klucz obcy
+    @JoinColumn(name = "author_id")
     @JsonManagedReference
     private Author author;
 
