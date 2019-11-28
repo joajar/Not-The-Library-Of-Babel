@@ -119,7 +119,6 @@ public class CatalogControllerTest {
                 .andExpect(jsonPath("$.isbn").value(Matchers.is("9788328327832")))
                 .andExpect(jsonPath("$.authorSet").exists())
                 .andExpect(jsonPath("$.authorSet", hasSize(3)))
-        //.andExpect(jsonPath("$.authorSet[0].lastName").value(Matchers.is("King")))
         ;
 
         verify(catalogService, times(1)).findBookByBookId(3L);

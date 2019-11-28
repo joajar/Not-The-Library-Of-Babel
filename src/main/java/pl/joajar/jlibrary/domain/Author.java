@@ -18,7 +18,7 @@ import java.util.Set;
 public class Author {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "id", nullable = false, updatable = false)
     private Long id;
 
     @Pattern(regexp = "^[.\\u0119\\s\\p{Alnum}]{2,}$", message = "First name should consist of at least 2 signs, taken out of the set of all alphanumeric signs, and additionally the whitespace and the full stop.")

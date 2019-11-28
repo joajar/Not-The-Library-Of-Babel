@@ -39,6 +39,7 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     public Author findById(Long id) throws ResourceNotFoundException {
+        LOG.info("AuthorServiceImpl.findById: finding the author with id = {} provided it exists.", id);
         return authorRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(id));
     }
@@ -46,12 +47,12 @@ public class AuthorServiceImpl implements AuthorService {
     @Override
     public Author findAtRandom() throws ResourceNotFoundException {
         long authorsListSize = authorRepository.count();
+
         LOG.info("AuthorServiceImpl.findAtRandom: finding one author at random, out of {} authors", authorsListSize);
+
         if (authorsListSize == 0) throw new ResourceNotFoundException("There is no author at the database!");
 
-        Long id = (long) (Math.random() * authorsListSize) + 1;
-
-        return findById(id);
+        return findById((long) (Math.random() * authorsListSize) + 1);
     }
 
     @Override
@@ -126,6 +127,4 @@ public class AuthorServiceImpl implements AuthorService {
             authorRepository.delete(authorRepository.findById(id).get());
         LOG.info("AuthorServiceImpl.delete: deleting the author with id = {} provided it exists.", id);
     }
-
-
 }

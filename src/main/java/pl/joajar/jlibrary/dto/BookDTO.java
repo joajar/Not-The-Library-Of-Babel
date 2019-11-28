@@ -6,8 +6,7 @@ import lombok.*;
 @AllArgsConstructor
 @Getter
 @Setter
-@Builder
-public class AuthorCreateDTO {
+public class BookDTO extends BookCreateDTO {
     @NonNull
-    private String firstName, lastName;
+    private Long id;
 }
