@@ -45,4 +45,3 @@ public class CatalogController {
         return new ResponseEntity<>(catalogService.findBookAtRandom(), HttpStatus.OK);
     }
 }
-

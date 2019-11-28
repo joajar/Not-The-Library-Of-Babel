@@ -52,4 +52,17 @@ public class Book {
 
         this.relationSet = Stream.of(relationSet).collect(Collectors.toSet());
     }
+
+    public Book(Long id, String title, String isbn, LocalDate publicationDate, Relation... relationSet) {
+
+        this.id = id;
+        this.title = title;
+        this.isbn = isbn;
+        this.publicationDate = publicationDate;
+
+        for (Relation relation : relationSet)
+            relation.setBook(this);
+
+        this.relationSet = Stream.of(relationSet).collect(Collectors.toSet());
+    }
 }

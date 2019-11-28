@@ -6,6 +6,7 @@ import pl.joajar.jlibrary.domain.Relation;
 
 import java.util.List;
 
+
 @Repository
 public interface RelationRepository extends JpaRepository<Relation, Long> {
     List<Relation> findRelationByBook_Id(Long bookId);

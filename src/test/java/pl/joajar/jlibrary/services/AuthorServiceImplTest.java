@@ -8,6 +8,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import pl.joajar.jlibrary.domain.Author;
+import pl.joajar.jlibrary.dto.AuthorCreateDTO;
+import pl.joajar.jlibrary.exceptions.DuplicateResourceException;
+import pl.joajar.jlibrary.exceptions.NullDataProvidedException;
 import pl.joajar.jlibrary.exceptions.ResourceNotFoundException;
 import pl.joajar.jlibrary.repository.AuthorRepository;
 
@@ -131,6 +134,166 @@ public class AuthorServiceImplTest {
         //then
         assertNull(author);
         verify(authorRepository, times(1)).count();
+        verifyNoMoreInteractions(authorRepository);
+    }
+
+    @Test
+    public void should_save_new_author() {
+        //given
+        final Author Walls = Author.builder().id(6L).firstName("Craig").lastName("Walls").build();
+        final AuthorCreateDTO WallsDTO = AuthorCreateDTO.builder().firstName("Craig").lastName("Walls").build();
+        final Author author;
+
+        //when
+        when(authorRepository.save(any(Author.class))).thenReturn(Walls);
+        author = authorService.save(WallsDTO);
+
+        //then
+        assertNotNull(author);
+        assertEquals("Craig", author.getFirstName());
+        assertEquals("Walls", author.getLastName());
+        verify(authorRepository, times(1)).save(any(Author.class));
+        verify(authorRepository, times(1)).findByFirstNameAndLastName("Craig", "Walls");
+        verifyNoMoreInteractions(authorRepository);
+    }
+
+    @Test(expected = DuplicateResourceException.class)
+    public void should_fail_while_saving_author_that_exists() {
+        //given
+        AuthorCreateDTO WallsDTO = AuthorCreateDTO.builder().firstName("Craig").lastName("Walls").build();
+        final Author author;
+
+        //when
+        when(authorRepository.findByFirstNameAndLastName("Craig", "Walls")).thenThrow(DuplicateResourceException.class);
+        author = authorService.save(WallsDTO);
+
+        //then
+        assertNull(author);
+        verify(authorRepository, times(1)).findByFirstNameAndLastName("Craig", "Walls");
+        verifyNoMoreInteractions(authorRepository);
+    }
+
+    @Test
+    public void should_update_all_author_attributes() {
+        //given
+        final Author Bloch_to_check_updating_all_attributes = Author.builder().id(11L).firstName("Joshua").lastName("Bloch").build();
+        final Author Horstmann_to_check_updating_firstName = Author.builder().id(12L).firstName("Cay S.").lastName("Horstmann").build();
+        final Author Horstmann_to_check_updating_lastName = Author.builder().id(13L).firstName("Cay S.").lastName("Horstmann").build();
+
+        final AuthorCreateDTO WallsDTO_to_check_updating_all_attributes = AuthorCreateDTO.builder().firstName("Craig").lastName("Walls").build();
+        final AuthorCreateDTO WallsDTO_to_check_updating_firstName = AuthorCreateDTO.builder().firstName("Craig").lastName("").build();
+        final AuthorCreateDTO WallsDTO_to_check_updating_lastName = AuthorCreateDTO.builder().firstName("").lastName("Walls").build();
+
+        final Author author_to_check_updating_all_attributes, author_to_check_updating_firstName, author_to_check_updating_lastName;
+
+        //when
+        author_to_check_updating_all_attributes = authorService.updateAttributesOfAuthorFound(
+                Bloch_to_check_updating_all_attributes, WallsDTO_to_check_updating_all_attributes
+        );
+        author_to_check_updating_firstName = authorService.updateAttributesOfAuthorFound(
+                Horstmann_to_check_updating_firstName, WallsDTO_to_check_updating_firstName
+        );
+        author_to_check_updating_lastName = authorService.updateAttributesOfAuthorFound(
+                Horstmann_to_check_updating_lastName, WallsDTO_to_check_updating_lastName
+        );
+
+        //then
+        assertNotNull(author_to_check_updating_all_attributes);
+        assertEquals(11L, (long) author_to_check_updating_all_attributes.getId());
+        assertEquals("Craig", author_to_check_updating_all_attributes.getFirstName());
+        assertEquals("Walls", author_to_check_updating_all_attributes.getLastName());
+
+        assertNotNull(author_to_check_updating_firstName);
+        assertEquals(12L, (long) author_to_check_updating_firstName.getId());
+        assertEquals("Craig", author_to_check_updating_firstName.getFirstName());
+        assertEquals("Horstmann", author_to_check_updating_firstName.getLastName());
+
+        assertNotNull(author_to_check_updating_lastName);
+        assertEquals(13L, (long) author_to_check_updating_lastName.getId());
+        assertEquals("Cay S.", author_to_check_updating_lastName.getFirstName());
+        assertEquals("Walls", author_to_check_updating_lastName.getLastName());
+
+        verifyNoInteractions(authorRepository);
+    }
+
+    @Test
+    public void should_update_author() {
+        //given
+        final Author Bloch = Author.builder().id(11L).firstName("Joshua").lastName("Bloch").build();
+
+        final AuthorCreateDTO WallsDTO = AuthorCreateDTO.builder().firstName("Craig").lastName("Walls").build();
+
+        final Author author;
+
+        //when
+        author = authorService.updateFoundAuthor(Bloch, WallsDTO);
+
+        //then
+        assertNotNull(author);
+        assertEquals(11L, (long) author.getId());
+        assertEquals("Craig", author.getFirstName());
+        assertEquals("Walls", author.getLastName());
+        verifyNoInteractions(authorRepository);
+    }
+
+    @Test(expected = NullDataProvidedException.class)
+    public void should_fail_while_updating_author_when_firstName_is_empty_String() {
+        //given
+        final Author Bloch = Author.builder().id(11L).firstName("Joshua").lastName("Bloch").build();
+
+        final AuthorCreateDTO WallsDTO = AuthorCreateDTO.builder().firstName("").lastName("Walls").build();
+
+        final Author author;
+
+        //when
+        author = authorService.updateFoundAuthor(Bloch, WallsDTO);
+
+        //then
+        assertNull(author);
+        verifyNoInteractions(authorRepository);
+    }
+
+    @Test(expected = NullDataProvidedException.class)
+    public void should_fail_while_updating_author_when_lastName_is_empty_String() {
+        //given
+        final Author Bloch = Author.builder().id(11L).firstName("Joshua").lastName("Bloch").build();
+
+        final AuthorCreateDTO WallsDTO = AuthorCreateDTO.builder().firstName("Craig").lastName("").build();
+
+        final Author author;
+
+        //when
+        author = authorService.updateFoundAuthor(Bloch, WallsDTO);
+
+        //then
+        assertNull(author);
+        verifyNoInteractions(authorRepository);
+    }
+
+    @Test
+    public void should_delete_author() {
+        //given
+        final Author Walls = Author.builder().id(6L).firstName("Craig").lastName("Walls").build();
+
+        //when
+        when(authorRepository.findById(6L)).thenReturn(Optional.of(Walls));
+        doNothing().when(authorRepository).delete(Walls);
+        authorService.delete(6L);
+
+        //then
+        verify(authorRepository, times(2)).findById(6L);
+        verify(authorRepository, times(1)).delete(any(Author.class));
+        verifyNoMoreInteractions(authorRepository);
+    }
+
+    @Test
+    public void should_do_nothing_while_trying_to_delete_nonexistent_author() {
+        //when
+        when(authorRepository.findById(6L)).thenReturn(Optional.empty());
+        authorService.delete(6L);
+
+        //then
+        verify(authorRepository, times(1)).findById(6L);
         verifyNoMoreInteractions(authorRepository);
     }
 }

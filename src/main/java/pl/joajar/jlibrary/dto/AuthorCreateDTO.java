@@ -7,7 +7,7 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
-class AuthorCreateDTO {
+public class AuthorCreateDTO {
     @NonNull
     private String firstName, lastName;
 }
