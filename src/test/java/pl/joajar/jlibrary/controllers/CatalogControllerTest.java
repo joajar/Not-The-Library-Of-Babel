@@ -48,18 +48,18 @@ public class CatalogControllerTest {
     @Test
     public void should_get_all_books_catalog() throws Exception {
         //given
-        AuthorDTO HorstmannDTO = new AuthorDTO("Cay S.", "Horstmann", 1L);
-        AuthorDTO BauerDTO = new AuthorDTO("Christian", "Bauer", 2L);
-        AuthorDTO KingDTO = new AuthorDTO("Gavin", "King", 3L);
-        AuthorDTO GregoryDTO = new AuthorDTO("Gary", "Gregory", 4L);
+        final AuthorDTO HorstmannDTO = new AuthorDTO("Cay S.", "Horstmann", 1L);
+        final AuthorDTO BauerDTO = new AuthorDTO("Christian", "Bauer", 2L);
+        final AuthorDTO KingDTO = new AuthorDTO("Gavin", "King", 3L);
+        final AuthorDTO GregoryDTO = new AuthorDTO("Gary", "Gregory", 4L);
 
-        BookWithAuthorSetDTO Java1 = BookWithAuthorSetDTO.builder().id(1L).title("Java. Podstawy. Wydanie X").publicationDate(LocalDate.of(2016, 9, 26))
+        final BookWithAuthorSetDTO Java1 = BookWithAuthorSetDTO.builder().id(1L).title("Java. Podstawy. Wydanie X").publicationDate(LocalDate.of(2016, 9, 26))
                 .isbn("9788328324800").authorSet(Collections.singleton(HorstmannDTO)).build();
 
-        BookWithAuthorSetDTO Java2 = BookWithAuthorSetDTO.builder().id(2L).title("Java. Techniki zaawansowane. Wydanie X").publicationDate(LocalDate.of(2017, 9, 28))
+        final BookWithAuthorSetDTO Java2 = BookWithAuthorSetDTO.builder().id(2L).title("Java. Techniki zaawansowane. Wydanie X").publicationDate(LocalDate.of(2017, 9, 28))
                 .isbn("9788328334809").authorSet(Collections.singleton(HorstmannDTO)).build();
 
-        BookWithAuthorSetDTO Hibernate = BookWithAuthorSetDTO.builder().id(3L).title("Java Persistence. Programowanie aplikacji bazodanowych w Hibernate. Wydanie II").isbn("9788328327832")
+        final BookWithAuthorSetDTO Hibernate = BookWithAuthorSetDTO.builder().id(3L).title("Java Persistence. Programowanie aplikacji bazodanowych w Hibernate. Wydanie II").isbn("9788328327832")
                 .publicationDate(LocalDate.of(2016, 12, 13))
                 .authorSet(Stream.of(BauerDTO, KingDTO, GregoryDTO).collect(Collectors.toSet())).build();
 
@@ -98,11 +98,11 @@ public class CatalogControllerTest {
     @Test
     public void should_get_book_by_id() throws Exception {
         //given
-        AuthorDTO BauerDTO = new AuthorDTO("Christian", "Bauer", 2L);
-        AuthorDTO KingDTO = new AuthorDTO("Gavin", "King", 3L);
-        AuthorDTO GregoryDTO = new AuthorDTO("Gary", "Gregory", 4L);
+        final AuthorDTO BauerDTO = new AuthorDTO("Christian", "Bauer", 2L);
+        final AuthorDTO KingDTO = new AuthorDTO("Gavin", "King", 3L);
+        final AuthorDTO GregoryDTO = new AuthorDTO("Gary", "Gregory", 4L);
 
-        BookWithAuthorSetDTO Hibernate = BookWithAuthorSetDTO.builder().id(3L).title("Java Persistence. Programowanie aplikacji bazodanowych w Hibernate. Wydanie II").isbn("9788328327832")
+        final BookWithAuthorSetDTO Hibernate = BookWithAuthorSetDTO.builder().id(3L).title("Java Persistence. Programowanie aplikacji bazodanowych w Hibernate. Wydanie II").isbn("9788328327832")
                 .publicationDate(LocalDate.of(2016, 12, 13))
                 .authorSet(Stream.of(BauerDTO, KingDTO, GregoryDTO).collect(Collectors.toSet())).build();
 
@@ -128,11 +128,11 @@ public class CatalogControllerTest {
     @Test
     public void should_get_book_at_random() throws Exception {
         //given
-        AuthorDTO BauerDTO = new AuthorDTO("Christian", "Bauer", 2L);
-        AuthorDTO KingDTO = new AuthorDTO("Gavin", "King", 3L);
-        AuthorDTO GregoryDTO = new AuthorDTO("Gary", "Gregory", 4L);
+        final AuthorDTO BauerDTO = new AuthorDTO("Christian", "Bauer", 2L);
+        final AuthorDTO KingDTO = new AuthorDTO("Gavin", "King", 3L);
+        final AuthorDTO GregoryDTO = new AuthorDTO("Gary", "Gregory", 4L);
 
-        BookWithAuthorSetDTO Hibernate = BookWithAuthorSetDTO.builder().id(3L).title("Java Persistence. Programowanie aplikacji bazodanowych w Hibernate. Wydanie II").isbn("9788328327832")
+        final BookWithAuthorSetDTO Hibernate = BookWithAuthorSetDTO.builder().id(3L).title("Java Persistence. Programowanie aplikacji bazodanowych w Hibernate. Wydanie II").isbn("9788328327832")
                 .publicationDate(LocalDate.of(2016, 12, 13))
                 .authorSet(Stream.of(BauerDTO, KingDTO, GregoryDTO).collect(Collectors.toSet())).build();
 

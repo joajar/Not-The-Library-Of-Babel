@@ -33,6 +33,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public List<Book> findAll() {
+        LOG.info("BookServiceImpl.findAll: finding all books from the library.");
         return bookRepository.findAll();
     }
 
