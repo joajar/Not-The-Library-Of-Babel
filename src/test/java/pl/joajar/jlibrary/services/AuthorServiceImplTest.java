@@ -72,6 +72,40 @@ public class AuthorServiceImplTest {
     }
 
     @Test
+    public void should_find_authors_with_given_last_name_fragment() {
+        //given
+        final Author Horstmann = Author.builder().id(1L).firstName("Cay S.").lastName("Horstmann").build();
+        final Author Gregory = Author.builder().id(5L).firstName("Gary").lastName("Gregory").build();
+        final List<Author> authors;
+
+        //when
+        when(authorRepository.findByLastNameIgnoringCaseContaining("or")).thenReturn(Arrays.asList(Horstmann, Gregory));
+        authors = authorService.findByLastNameFragment("or");
+
+        //then
+        assertEquals(2, authors.size());
+        assertEquals(Arrays.asList(Horstmann, Gregory), authors);
+        verify(authorRepository, times(1)).findByLastNameIgnoringCaseContaining(anyString());
+        verifyNoMoreInteractions(authorRepository);
+    }
+
+    @Test(expected = ResourceNotFoundException.class)
+    public void should_fail_while_finding_nonexistent_author_by_last_name_fragment() {
+        //given
+        final List<Author> authorList;
+
+        //when
+        when(authorRepository.findByLastNameIgnoringCaseContaining(anyString())).thenThrow(ResourceNotFoundException.class);
+        authorList = authorService.findByLastNameFragment("wezyk");
+
+        //then
+        assertNull(authorList);
+        verify(authorRepository, times(1)).findByLastNameIgnoringCaseContaining(anyString());
+        verifyNoMoreInteractions(authorRepository);
+    }
+
+
+    @Test
     public void should_find_author_by_id() {
         //given
         final Author Bloch = Author.builder().firstName("Joshua").lastName("Bloch").build();

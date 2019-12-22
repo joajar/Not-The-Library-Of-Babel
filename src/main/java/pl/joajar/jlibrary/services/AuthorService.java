@@ -9,9 +9,11 @@ import pl.joajar.jlibrary.exceptions.ResourceNotFoundException;
 import java.util.List;
 
 public interface AuthorService {
+    List<Author> saveAll(Iterable<Author> iterator);
+
     List<Author> findAll();
 
-    List<Author> saveAll(Iterable<Author> iterator);
+    List<Author> findByLastNameFragment(String lastNameFragment) throws ResourceNotFoundException;
 
     Author findById(Long id) throws ResourceNotFoundException;
 

@@ -33,6 +33,12 @@ public class AuthorController {
         return new ResponseEntity<>(authorService.findAll(), HttpStatus.OK);
     }
 
+    @GetMapping(value = "/lastname/{lastNameFragment}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Author>> getAuthorByLastNameFragment(@PathVariable("lastNameFragment") String lastNameFragment) {
+        LOG.info("AuthorController.getAuthorByLastNameFragment: finding the author with id = {}.", lastNameFragment);
+        return new ResponseEntity<>(authorService.findByLastNameFragment(lastNameFragment), HttpStatus.OK);
+    }
+
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Author> getAuthorById(@PathVariable("id") Long id) {
         LOG.info("AuthorController.getAuthorById: finding the author with id = {}.", id);

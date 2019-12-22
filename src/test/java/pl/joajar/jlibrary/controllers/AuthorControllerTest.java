@@ -21,6 +21,7 @@ import pl.joajar.jlibrary.exceptions.ResourceNotFoundException;
 import pl.joajar.jlibrary.services.AuthorServiceImpl;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
@@ -70,6 +71,41 @@ public class AuthorControllerTest {
                 .andExpect(jsonPath("$[1].lastName", is("Bloch")));
 
         verify(authorService, times(1)).findAll();
+        verifyNoMoreInteractions(authorService);
+    }
+
+    @Test
+    public void should_get_author_by_last_name_fragment() throws Exception {
+        //given
+        final Author Bloch = Author.builder().id(1L).firstName("Joshua").lastName("Bloch").build();
+
+        //when
+        when(authorService.findByLastNameFragment(anyString())).thenReturn(Collections.singletonList(Bloch));
+
+        //then
+        mockMvc.perform(get("/v1/library/authors/lastname/{lastNameFragment}", "loch").accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].id").exists())
+                .andExpect(jsonPath("$[0].id").value(Matchers.is(1)))
+                .andExpect(jsonPath("$[0].firstName", is("Joshua")))
+                .andExpect(jsonPath("$[0].lastName", is("Bloch")));
+
+        verify(authorService, times(1)).findByLastNameFragment(anyString());
+        verifyNoMoreInteractions(authorService);
+    }
+
+    @Test
+    public void should_fail_while_getting_authors_list_with_last_name_nonexistent_in_db() throws Exception {
+        //when
+        when(authorService.findByLastNameFragment(anyString())).thenThrow(ResourceNotFoundException.class);
+
+        //then
+        mockMvc.perform(get("/v1/library/authors/lastname/{lastNameFragment}", "diabelek").accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isNotFound());
+
+        verify(authorService, times(1)).findByLastNameFragment(anyString());
         verifyNoMoreInteractions(authorService);
     }
 

@@ -32,6 +32,25 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
+    public List<Author> findByLastNameFragment(String lastNameFragment) throws ResourceNotFoundException {
+        LOG.info("AuthorServiceImpl.findByLastNameFragment: finding the author with its second name containing {} provided it exists.", lastNameFragment);
+
+        List<Author> authorList = authorRepository.findByLastNameIgnoringCaseContaining(lastNameFragment);
+
+        if (authorList == null) {
+            LOG.info("AuthorServiceImpl.findByLastNameFragment: there is null instead of the list with authors containing {} in their last names.", lastNameFragment);
+            throw new ResourceNotFoundException("AuthorServiceImpl.findByLastNameFragment: found no author satisfying given condition.");
+        }
+
+        if (authorList.size() == 0) {
+            LOG.info("AuthorServiceImpl.findByLastNameFragment: the list with authors containing {} in their last names is empty.", lastNameFragment);
+            throw new ResourceNotFoundException("AuthorServiceImpl.findByLastNameFragment: found no author satisfying given condition.");
+        }
+
+        return authorList;
+    }
+
+    @Override
     public List<Author> saveAll(Iterable<Author> iterator) {
         LOG.info("AuthorServiceImpl.saveAll: saving all authors from the iterator.");
         return authorRepository.saveAll(iterator);

@@ -8,43 +8,37 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import java.util.Collections;
-
 @ControllerAdvice
 public class LibraryExceptionHandler extends ResponseEntityExceptionHandler {
     private static final Logger LOG = LoggerFactory.getLogger(LibraryExceptionHandler.class);
 
     @ExceptionHandler(value = ResourceNotFoundException.class) // 404
-    protected ResponseEntity<Object> handleResourceNotFound(ResourceNotFoundException ex) {
+    protected ResponseEntity<Object> handleResourceNotFound() {
         ErrorResponse errorResponse = new ErrorResponse(
                 HttpStatus.NOT_FOUND,
-                ex.getMessage(),
-                Collections.singletonList("Resource does not exist.")
+                "Resource has not been found."
         );
         LOG.info("LibraryExceptionHandler.handleResourceNotFound: throwing ResourceNotFoundException, resource does not exist.");
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(value = DuplicateResourceException.class) // 409
-    protected ResponseEntity<Object> handleDuplicateResource(DuplicateResourceException ex) {
+    protected ResponseEntity<Object> handleDuplicateResource() {
         ErrorResponse errorResponse = new ErrorResponse(
                 HttpStatus.CONFLICT,
-                ex.getMessage(),
-                Collections.singletonList("Resource already exist at the database.")
+                "Resource already exist at the database."
         );
         LOG.info("LibraryExceptionHandler.handleDuplicateResource: throwing DuplicateResourceException, resource already exist.");
         return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(value = NullDataProvidedException.class) // 406
-    protected ResponseEntity<Object> handleNullDataProvided(NullDataProvidedException ex) {
+    protected ResponseEntity<Object> handleNullDataProvided() {
         ErrorResponse errorResponse = new ErrorResponse(
                 HttpStatus.NOT_ACCEPTABLE,
-                ex.getMessage(),
-                Collections.singletonList("Provided data contain null or empty String.")
+                "Provided data contain null or empty String."
         );
         LOG.info("LibraryExceptionHandler.handleNullDataProvided: throwing NullDataProvidedException, provided data contain null or empty String.");
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_ACCEPTABLE);
-
     }
 }
