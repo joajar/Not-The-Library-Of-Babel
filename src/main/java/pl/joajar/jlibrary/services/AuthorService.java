@@ -15,6 +15,8 @@ public interface AuthorService {
 
     List<Author> findByLastNameFragment(String lastNameFragment) throws ResourceNotFoundException;
 
+    List<Author> findByFirstNameFragment(String firstNameFragment) throws ResourceNotFoundException;
+
     Author findById(Long id) throws ResourceNotFoundException;
 
     Author findAtRandom() throws ResourceNotFoundException;

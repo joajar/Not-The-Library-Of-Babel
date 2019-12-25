@@ -32,10 +32,29 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
-    public List<Author> findByLastNameFragment(String lastNameFragment) throws ResourceNotFoundException {
-        LOG.info("AuthorServiceImpl.findByLastNameFragment: finding the author with its second name containing {} provided it exists.", lastNameFragment);
+    public List<Author> findByFirstNameFragment(String firstNameFragment) throws ResourceNotFoundException {
+        LOG.info("AuthorServiceImpl.findByFirstNameFragment: finding the author with its first name containing {} provided it exists.", firstNameFragment);
 
-        List<Author> authorList = authorRepository.findByLastNameIgnoringCaseContaining(lastNameFragment);
+        List<Author> authorList = authorRepository.findByFirstNameIgnoringCaseContainingOrderById(firstNameFragment);
+
+        if (authorList == null) {
+            LOG.info("AuthorServiceImpl.findByFirstNameFragment: there is null instead of the list with authors containing {} in their first names.", firstNameFragment);
+            throw new ResourceNotFoundException("AuthorServiceImpl.findByFirstNameFragment: found no author satisfying given condition.");
+        }
+
+        if (authorList.size() == 0) {
+            LOG.info("AuthorServiceImpl.findByFirstNameFragment: the list with authors containing {} in their first names is empty.", firstNameFragment);
+            throw new ResourceNotFoundException("AuthorServiceImpl.findByFirstNameFragment: found no author satisfying given condition.");
+        }
+
+        return authorList;
+    }
+
+    @Override
+    public List<Author> findByLastNameFragment(String lastNameFragment) throws ResourceNotFoundException {
+        LOG.info("AuthorServiceImpl.findByLastNameFragment: finding the author with its last name containing {} provided it exists.", lastNameFragment);
+
+        List<Author> authorList = authorRepository.findByLastNameIgnoringCaseContainingOrderById(lastNameFragment);
 
         if (authorList == null) {
             LOG.info("AuthorServiceImpl.findByLastNameFragment: there is null instead of the list with authors containing {} in their last names.", lastNameFragment);

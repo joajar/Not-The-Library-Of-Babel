@@ -79,13 +79,13 @@ public class AuthorServiceImplTest {
         final List<Author> authors;
 
         //when
-        when(authorRepository.findByLastNameIgnoringCaseContaining("or")).thenReturn(Arrays.asList(Horstmann, Gregory));
+        when(authorRepository.findByLastNameIgnoringCaseContainingOrderById("or")).thenReturn(Arrays.asList(Horstmann, Gregory));
         authors = authorService.findByLastNameFragment("or");
 
         //then
         assertEquals(2, authors.size());
         assertEquals(Arrays.asList(Horstmann, Gregory), authors);
-        verify(authorRepository, times(1)).findByLastNameIgnoringCaseContaining(anyString());
+        verify(authorRepository, times(1)).findByLastNameIgnoringCaseContainingOrderById(anyString());
         verifyNoMoreInteractions(authorRepository);
     }
 
@@ -95,15 +95,47 @@ public class AuthorServiceImplTest {
         final List<Author> authorList;
 
         //when
-        when(authorRepository.findByLastNameIgnoringCaseContaining(anyString())).thenThrow(ResourceNotFoundException.class);
+        when(authorRepository.findByLastNameIgnoringCaseContainingOrderById(anyString())).thenThrow(ResourceNotFoundException.class);
         authorList = authorService.findByLastNameFragment("wezyk");
 
         //then
         assertNull(authorList);
-        verify(authorRepository, times(1)).findByLastNameIgnoringCaseContaining(anyString());
+        verify(authorRepository, times(1)).findByLastNameIgnoringCaseContainingOrderById(anyString());
         verifyNoMoreInteractions(authorRepository);
     }
 
+    @Test
+    public void should_find_authors_with_given_first_name_fragment() {
+        //given
+        final Author Bauer = Author.builder().id(3L).firstName("Christian").lastName("Bauer").build();
+        final Author Mehta = Author.builder().id(7L).firstName("Bhakti").lastName("Mehta").build();
+        final List<Author> authors;
+
+        //when
+        when(authorRepository.findByFirstNameIgnoringCaseContainingOrderById("ti")).thenReturn(Arrays.asList(Bauer, Mehta));
+        authors = authorService.findByFirstNameFragment("ti");
+
+        //then
+        assertEquals(2, authors.size());
+        assertEquals(Arrays.asList(Bauer, Mehta), authors);
+        verify(authorRepository, times(1)).findByFirstNameIgnoringCaseContainingOrderById(anyString());
+        verifyNoMoreInteractions(authorRepository);
+    }
+
+    @Test(expected = ResourceNotFoundException.class)
+    public void should_fail_while_finding_nonexistent_author_by_first_name_fragment() {
+        //given
+        final List<Author> authorList;
+
+        //when
+        when(authorRepository.findByFirstNameIgnoringCaseContainingOrderById(anyString())).thenThrow(ResourceNotFoundException.class);
+        authorList = authorService.findByFirstNameFragment("wezyk");
+
+        //then
+        assertNull(authorList);
+        verify(authorRepository, times(1)).findByFirstNameIgnoringCaseContainingOrderById(anyString());
+        verifyNoMoreInteractions(authorRepository);
+    }
 
     @Test
     public void should_find_author_by_id() {

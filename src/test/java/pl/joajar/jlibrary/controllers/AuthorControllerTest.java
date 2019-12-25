@@ -110,6 +110,41 @@ public class AuthorControllerTest {
     }
 
     @Test
+    public void should_get_author_by_first_name_fragment() throws Exception {
+        //given
+        final Author Bloch = Author.builder().id(1L).firstName("Joshua").lastName("Bloch").build();
+
+        //when
+        when(authorService.findByFirstNameFragment(anyString())).thenReturn(Collections.singletonList(Bloch));
+
+        //then
+        mockMvc.perform(get("/v1/library/authors/firstname/{firstNameFragment}", "Jos").accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].id").exists())
+                .andExpect(jsonPath("$[0].id").value(Matchers.is(1)))
+                .andExpect(jsonPath("$[0].firstName", is("Joshua")))
+                .andExpect(jsonPath("$[0].lastName", is("Bloch")));
+
+        verify(authorService, times(1)).findByFirstNameFragment(anyString());
+        verifyNoMoreInteractions(authorService);
+    }
+
+    @Test
+    public void should_fail_while_getting_authors_list_with_first_name_nonexistent_in_db() throws Exception {
+        //when
+        when(authorService.findByFirstNameFragment(anyString())).thenThrow(ResourceNotFoundException.class);
+
+        //then
+        mockMvc.perform(get("/v1/library/authors/firstname/{firstNameFragment}", "diabelek").accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isNotFound());
+
+        verify(authorService, times(1)).findByFirstNameFragment(anyString());
+        verifyNoMoreInteractions(authorService);
+    }
+
+    @Test
     public void should_get_author_by_id() throws Exception {
         //given
         final Author Bloch = Author.builder().id(1L).firstName("Joshua").lastName("Bloch").build();
