@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.joajar.jlibrary.domain.Book;
@@ -30,5 +31,11 @@ public class BookController {
     public ResponseEntity<List<Book>> getAllBooks() {
         LOG.info("BookController.getAllBooks: finding all authors from the library.");
         return new ResponseEntity<>(bookService.findAll(), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/publicationyear/{publicationYear}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Book>> getBookByPublicationYear(@PathVariable("publicationYear") String publicationYear) {
+        LOG.info("BookController.getBookByPublicationYear: finding books published in year {}.", publicationYear);
+        return new ResponseEntity<>(bookService.findByPublicationYear(publicationYear), HttpStatus.OK);
     }
 }

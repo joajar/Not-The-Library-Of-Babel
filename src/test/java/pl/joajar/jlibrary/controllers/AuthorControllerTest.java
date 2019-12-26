@@ -16,7 +16,7 @@ import pl.joajar.jlibrary.domain.Author;
 import pl.joajar.jlibrary.dto.AuthorCreateDTO;
 import pl.joajar.jlibrary.exceptions.DuplicateResourceException;
 import pl.joajar.jlibrary.exceptions.LibraryExceptionHandler;
-import pl.joajar.jlibrary.exceptions.NullDataProvidedException;
+import pl.joajar.jlibrary.exceptions.WrongDataProvidedException;
 import pl.joajar.jlibrary.exceptions.ResourceNotFoundException;
 import pl.joajar.jlibrary.services.AuthorServiceImpl;
 
@@ -363,7 +363,7 @@ public class AuthorControllerTest {
         final AuthorCreateDTO BlochDTO = AuthorCreateDTO.builder().firstName("").lastName("Bloch").build();
 
         //when
-        when(authorService.updateAuthorThenSave(anyLong(), any(AuthorCreateDTO.class))).thenThrow(NullDataProvidedException.class);
+        when(authorService.updateAuthorThenSave(anyLong(), any(AuthorCreateDTO.class))).thenThrow(WrongDataProvidedException.class);
 
         //then
         mockMvc.perform(

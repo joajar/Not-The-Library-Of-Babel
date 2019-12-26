@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import pl.joajar.jlibrary.domain.Author;
 import pl.joajar.jlibrary.dto.AuthorCreateDTO;
 import pl.joajar.jlibrary.exceptions.DuplicateResourceException;
-import pl.joajar.jlibrary.exceptions.NullDataProvidedException;
+import pl.joajar.jlibrary.exceptions.WrongDataProvidedException;
 import pl.joajar.jlibrary.exceptions.ResourceNotFoundException;
 import pl.joajar.jlibrary.repository.AuthorRepository;
 
@@ -133,18 +133,18 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
-    public Author updateFoundAuthor(Author author, AuthorCreateDTO authorCreateDTO) throws NullDataProvidedException {
+    public Author updateFoundAuthor(Author author, AuthorCreateDTO authorCreateDTO) throws WrongDataProvidedException {
 
         author.setFirstName(
                 Optional.ofNullable(authorCreateDTO.getFirstName())
                         .filter(firstName -> firstName.length() > 0)
-                        .orElseThrow(NullDataProvidedException::new)
+                        .orElseThrow(WrongDataProvidedException::new)
         );
 
         author.setLastName(
                 Optional.ofNullable(authorCreateDTO.getLastName())
                         .filter(lastName -> lastName.length() > 0)
-                        .orElseThrow(NullDataProvidedException::new)
+                        .orElseThrow(WrongDataProvidedException::new)
         );
 
         LOG.info("AuthorServiceImpl.updateFoundAuthor: the given author is updated.");
@@ -152,7 +152,7 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
-    public Author updateAuthorThenSave(Long id, AuthorCreateDTO authorCreateDTO) throws ResourceNotFoundException, NullDataProvidedException {
+    public Author updateAuthorThenSave(Long id, AuthorCreateDTO authorCreateDTO) throws ResourceNotFoundException, WrongDataProvidedException {
 
         Author author = findById(id);
 

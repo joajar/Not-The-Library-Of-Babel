@@ -10,7 +10,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import pl.joajar.jlibrary.domain.Author;
 import pl.joajar.jlibrary.dto.AuthorCreateDTO;
 import pl.joajar.jlibrary.exceptions.DuplicateResourceException;
-import pl.joajar.jlibrary.exceptions.NullDataProvidedException;
+import pl.joajar.jlibrary.exceptions.WrongDataProvidedException;
 import pl.joajar.jlibrary.exceptions.ResourceNotFoundException;
 import pl.joajar.jlibrary.repository.AuthorRepository;
 
@@ -302,7 +302,7 @@ public class AuthorServiceImplTest {
         verifyNoInteractions(authorRepository);
     }
 
-    @Test(expected = NullDataProvidedException.class)
+    @Test(expected = WrongDataProvidedException.class)
     public void should_fail_while_updating_author_when_firstName_is_empty_String() {
         //given
         final Author Bloch = Author.builder().id(11L).firstName("Joshua").lastName("Bloch").build();
@@ -319,7 +319,7 @@ public class AuthorServiceImplTest {
         verifyNoInteractions(authorRepository);
     }
 
-    @Test(expected = NullDataProvidedException.class)
+    @Test(expected = WrongDataProvidedException.class)
     public void should_fail_while_updating_author_when_lastName_is_empty_String() {
         //given
         final Author Bloch = Author.builder().id(11L).firstName("Joshua").lastName("Bloch").build();

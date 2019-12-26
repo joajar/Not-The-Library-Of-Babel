@@ -32,13 +32,13 @@ public class LibraryExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
     }
 
-    @ExceptionHandler(value = NullDataProvidedException.class) // 406
-    protected ResponseEntity<Object> handleNullDataProvided() {
+    @ExceptionHandler(value = WrongDataProvidedException.class) // 406
+    protected ResponseEntity<Object> handleWrongDataProvided() {
         ErrorResponse errorResponse = new ErrorResponse(
                 HttpStatus.NOT_ACCEPTABLE,
-                "Provided data contain null or empty String."
+                "Provided data contain null or empty String, or is wrong."
         );
-        LOG.info("LibraryExceptionHandler.handleNullDataProvided: throwing NullDataProvidedException, provided data contain null or empty String.");
+        LOG.info("LibraryExceptionHandler.handleWrongDataProvided: throwing NullDataProvidedException, provided data contain null or empty String, or is wrong.");
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_ACCEPTABLE);
     }
 }
