@@ -26,8 +26,11 @@ public class AnnotationDrivenContextStartedListener {
 
     @EventListener(ApplicationReadyEvent.class)
     public void fillInDatabase(){
-        String eighthLetterAtPolishAlphabet = "\u0119"; //Because of the Intellij problems with ę, see line below
-        final String bookTitle = "REST. Najlepsze praktyki i wzorce w j" + eighthLetterAtPolishAlphabet + "zyku Java";
+        String secondLetterOfPolishAlphabet = "\u0105";
+        String eighthLetterOfPolishAlphabet = "\u0119";
+        String twentyNinthLetterOfPolishAlphabet = "\u00f3";
+        final String modernJavaBookTitle = "Nowoczesne receptury w Javie. Proste rozwi" + secondLetterOfPolishAlphabet + "zania trudnych problem" + twentyNinthLetterOfPolishAlphabet + "w";
+        final String restBookTitle = "REST. Najlepsze praktyki i wzorce w j" + eighthLetterOfPolishAlphabet + "zyku Java";
 
         Author Horstmann = Author.builder().id(1L).firstName("Cay S.").lastName("Horstmann").build();
         Author Bloch = Author.builder().id(2L).firstName("Joshua").lastName("Bloch").build();
@@ -36,8 +39,9 @@ public class AnnotationDrivenContextStartedListener {
         Author Gregory = Author.builder().id(5L).firstName("Gary").lastName("Gregory").build();
         Author Walls = Author.builder().id(6L).firstName("Craig").lastName("Walls").build();
         Author Mehta = Author.builder().id(7L).firstName("Bhakti").lastName("Mehta").build();
+        Author Kousen = Author.builder().id(8L).firstName("Ken").lastName("Kousen").build();
 
-        authorService.saveAll(Arrays.asList(Horstmann, Bloch, Bauer, King, Gregory, Walls, Mehta));
+        authorService.saveAll(Arrays.asList(Horstmann, Bloch, Bauer, King, Gregory, Walls, Mehta, Kousen));
 
         bookService.save(
                 new Book("Java. Podstawy. Wydanie X", "9788328324800", LocalDate.of(2016, 9, 26),
@@ -60,7 +64,11 @@ public class AnnotationDrivenContextStartedListener {
                         new Relation(Walls)));
 
         bookService.save(
-                new Book(bookTitle, "9788328306448", LocalDate.of(2015, 6, 16),
+                new Book(restBookTitle, "9788328306448", LocalDate.of(2015, 6, 16),
                         new Relation(Mehta)));
+
+        bookService.save(
+                new Book(modernJavaBookTitle, "9788328340732", LocalDate.of(2018, 4, 13),
+                        new Relation(Kousen)));
     }
 }

@@ -25,7 +25,7 @@ public class Book {
     @Column(name = "id")
     private Long id;
 
-    @Pattern(regexp = "^[.,\\u0119\\s\\p{Alnum}]{2,}$", message="Title should consist of at least 2 signs, taken out of the set of all alphanumeric signs, space, comma, full stop.")
+    @Pattern(regexp = "^[.,\\u0105\\u00f3\\u0119\\s\\p{Alnum}]{2,}$", message="Title should consist of at least 2 signs, taken out of the set of all alphanumeric signs, space, comma, full stop.")
     @Column(name = "title")
     private String title;
 

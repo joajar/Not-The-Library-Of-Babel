@@ -9,10 +9,12 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import pl.joajar.jlibrary.domain.Book;
 import pl.joajar.jlibrary.exceptions.ResourceNotFoundException;
+import pl.joajar.jlibrary.exceptions.WrongDataProvidedException;
 import pl.joajar.jlibrary.repository.BookRepository;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -89,6 +91,53 @@ public class BookServiceImplTest {
 
         //then
         assertNull(book);
+    }
 
+    @Test
+    public void should_find_books_published_in_given_year() {
+        //given
+        final Book Spring5EnEd = Book.builder().id(6L).title("Spring in Action, Fifth Edition").isbn("9781617294945")
+                .publicationDate(LocalDate.of(2019, 10, 1)).build();
+
+        final List<Book> books;
+
+        //when
+        when(bookRepository.findByPublicationDateBetweenOrderById(any(), any())).thenReturn(Collections.singletonList(Spring5EnEd));
+        books = bookService.findByPublicationYear("19");
+
+        //then
+        assertEquals(1, books.size());
+        assertEquals(Collections.singletonList(Spring5EnEd), books);
+        verify(bookRepository, times(1)).findByPublicationDateBetweenOrderById(any(), any());
+        verifyNoMoreInteractions(bookRepository);
+    }
+
+    @Test(expected = ResourceNotFoundException.class)
+    public void should_fail_while_finding_nonexistent_book_by_publishing_year() {
+        //given
+        final List<Book> bookList;
+
+        //when
+        when(bookRepository.findByPublicationDateBetweenOrderById(any(), any())).thenReturn(Collections.emptyList());
+        bookList = bookService.findByPublicationYear("11");
+
+        //then
+        assertNull(bookList);
+        verify(bookRepository, times(1)).findByPublicationDateBetweenOrderById(any(), any());
+        verifyNoMoreInteractions(bookRepository);
+    }
+
+    @Test(expected = WrongDataProvidedException.class)
+    public void should_fail_while_finding_book_by_publishing_year_with_providing_nonnumerical_year_value() {
+        //given
+        final List<Book> bookList;
+
+        //when
+        bookList = bookService.findByPublicationYear("aa");
+
+        //then
+        assertNull(bookList);
+        verify(bookRepository, times(1)).findByPublicationDateBetweenOrderById(any(), any());
+        verifyNoMoreInteractions(bookRepository);
     }
 }

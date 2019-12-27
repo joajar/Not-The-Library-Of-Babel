@@ -12,10 +12,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import pl.joajar.jlibrary.domain.Book;
 import pl.joajar.jlibrary.exceptions.LibraryExceptionHandler;
+import pl.joajar.jlibrary.exceptions.ResourceNotFoundException;
+import pl.joajar.jlibrary.exceptions.WrongDataProvidedException;
 import pl.joajar.jlibrary.services.BookServiceImpl;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Collections;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.*;
@@ -74,5 +77,55 @@ public class BookControllerTest {
                 .andExpect(jsonPath("$[2].title").value(Matchers.is("Java Persistence. Programowanie aplikacji bazodanowych w Hibernate. Wydanie II")))
                 .andExpect(jsonPath("$[2].isbn").value(Matchers.is("9788328327832")))
         ;
+    }
+
+    @Test
+    public void should_get_book_by_publication_year() throws Exception {
+        //given
+        final Book Spring5EnEd = Book.builder().id(6L).title("Spring in Action, Fifth Edition").isbn("9781617294945")
+                .publicationDate(LocalDate.of(2019, 10, 1)).build();
+
+        //when
+        when(bookService.findByPublicationYear("19")).thenReturn(Collections.singletonList(Spring5EnEd));
+
+        //then
+        mockMvc.perform(get("/v1/library/books/publicationyear/{publicationYear}", "19").accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].id").exists())
+                .andExpect(jsonPath("$[0].id").value(Matchers.is(6)))
+                .andExpect(jsonPath("$[0].title").value(Matchers.is("Spring in Action, Fifth Edition")))
+                .andExpect(jsonPath("$[0].isbn").value(Matchers.is("9781617294945")))
+        ;
+
+        verify(bookService, times(1)).findByPublicationYear(anyString());
+        verifyNoMoreInteractions(bookService);
+    }
+
+    @Test
+    public void should_fail_while_getting_list_of_books_published_in_given_year_nonexistent_in_db() throws Exception {
+        //when
+        when(bookService.findByPublicationYear("11")).thenThrow(ResourceNotFoundException.class);
+
+        //then
+        mockMvc.perform(get("/v1/library/books/publicationyear/{publicationYear}", "11").accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isNotFound());
+
+        verify(bookService, times(1)).findByPublicationYear(anyString());
+        verifyNoMoreInteractions(bookService);
+    }
+
+    @Test
+    public void should_fail_while_getting_list_of_books_published_in_given_year_with_nonnumerical_year() throws Exception {
+        //when
+        when(bookService.findByPublicationYear("python")).thenThrow(WrongDataProvidedException.class);
+
+        //then
+        mockMvc.perform(get("/v1/library/books/publicationyear/{publicationYear}", "python").accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isNotAcceptable());
+
+        verify(bookService, times(1)).findByPublicationYear(anyString());
+        verifyNoMoreInteractions(bookService);
     }
 }
