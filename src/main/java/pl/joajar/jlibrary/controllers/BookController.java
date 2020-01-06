@@ -33,6 +33,12 @@ public class BookController {
         return new ResponseEntity<>(bookService.findAll(), HttpStatus.OK);
     }
 
+    @GetMapping(value = "/title/{titleFragment}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Book>> getBookByTitleFragment(@PathVariable("titleFragment") String titleFragment) {
+        LOG.info("BookController.getBookByTitleFragment: finding books with their titles containing {} provided it exists any.", titleFragment);
+        return new ResponseEntity<>(bookService.findByTitleFragment(titleFragment), HttpStatus.OK);
+    }
+
     @GetMapping(value = "/publicationyear/{publicationYear}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Book>> getBookByPublicationYear(@PathVariable("publicationYear") String publicationYear) {
         LOG.info("BookController.getBookByPublicationYear: finding books published in year {}.", publicationYear);

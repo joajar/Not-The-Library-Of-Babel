@@ -1,5 +1,7 @@
 
-# Not-The-Library-Of-Babel (under construction)
+# Not-The-Library-Of-Babel
+
+![GitHub last commit](https://img.shields.io/github/last-commit/joajar/Not-The-Library-Of-Babel)
 
 Do you know Borges' _Library of Babel_? 
 If not then read what's his diabolically mathematical 😈 library: <br>

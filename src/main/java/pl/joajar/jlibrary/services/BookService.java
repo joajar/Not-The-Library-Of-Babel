@@ -15,5 +15,7 @@ public interface BookService {
 
     Book findById(Long id) throws ResourceNotFoundException;
 
+    List<Book> findByTitleFragment(String titleFragment) throws ResourceNotFoundException;
+
     List<Book> findByPublicationYear(String publicationYear) throws ResourceNotFoundException, WrongDataProvidedException;
 }

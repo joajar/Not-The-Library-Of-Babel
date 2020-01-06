@@ -94,6 +94,43 @@ public class BookServiceImplTest {
     }
 
     @Test
+    public void should_find_books_with_given_title_fragment() {
+        //given
+        final Book Java1 = Book.builder().id(1L).title("Java. Podstawy. Wydanie X").publicationDate(LocalDate.of(2016, 9, 26))
+                .isbn("9788328324800").build();
+
+        final Book Java2 = Book.builder().id(2L).title("Java. Techniki zaawansowane. Wydanie X").publicationDate(LocalDate.of(2017, 9, 28))
+                .isbn("9788328334809").build();
+
+        final List<Book> books;
+
+        //when
+        when(bookRepository.findByTitleIgnoringCaseContainingOrderById("Wydanie X")).thenReturn(Arrays.asList(Java1, Java2));
+        books = bookService.findByTitleFragment("Wydanie X");
+
+        //then
+        assertEquals(2, books.size());
+        assertEquals(Arrays.asList(Java1, Java2), books);
+        verify(bookRepository, times(1)).findByTitleIgnoringCaseContainingOrderById(anyString());
+        verifyNoMoreInteractions(bookRepository);
+    }
+
+    @Test(expected = ResourceNotFoundException.class)
+    public void should_fail_while_finding_nonexistent_book_by_title_fragment() {
+        //given
+        final List<Book> bookList;
+
+        //when
+        when(bookRepository.findByTitleIgnoringCaseContainingOrderById(anyString())).thenReturn(Collections.emptyList());
+        bookList = bookService.findByTitleFragment("python");
+
+        //then
+        assertNull(bookList);
+        verify(bookRepository, times(1)).findByTitleIgnoringCaseContainingOrderById(anyString());
+        verifyNoMoreInteractions(bookRepository);
+    }
+
+    @Test
     public void should_find_books_published_in_given_year() {
         //given
         final Book Spring5EnEd = Book.builder().id(6L).title("Spring in Action, Fifth Edition").isbn("9781617294945")

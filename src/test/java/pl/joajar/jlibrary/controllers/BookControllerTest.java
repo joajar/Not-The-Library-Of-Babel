@@ -80,6 +80,49 @@ public class BookControllerTest {
     }
 
     @Test
+    public void should_get_book_by_title_fragment() throws Exception {
+        //given
+        final Book Java1 = Book.builder().id(1L).title("Java. Podstawy. Wydanie X").publicationDate(LocalDate.of(2016, 9, 26))
+                .isbn("9788328324800").build();
+
+        final Book Java2 = Book.builder().id(2L).title("Java. Techniki zaawansowane. Wydanie X").publicationDate(LocalDate.of(2017, 9, 28))
+                .isbn("9788328334809").build();
+
+        //when
+        when(bookService.findByTitleFragment("Wydanie X")).thenReturn(Arrays.asList(Java1, Java2));
+
+        //then
+        mockMvc.perform(get("/v1/library/books/title/{titleFragment}", "Wydanie X").accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0].id").exists())
+                .andExpect(jsonPath("$[0].id").value(Matchers.is(1)))
+                .andExpect(jsonPath("$[0].title").value(Matchers.is("Java. Podstawy. Wydanie X")))
+                .andExpect(jsonPath("$[0].isbn").value(Matchers.is("9788328324800")))
+                .andExpect(jsonPath("$[1].id").exists())
+                .andExpect(jsonPath("$[1].id").value(Matchers.is(2)))
+                .andExpect(jsonPath("$[1].title").value(Matchers.is("Java. Techniki zaawansowane. Wydanie X")))
+                .andExpect(jsonPath("$[1].isbn").value(Matchers.is("9788328334809")));
+
+        verify(bookService, times(1)).findByTitleFragment(anyString());
+        verifyNoMoreInteractions(bookService);
+    }
+
+    @Test
+    public void should_fail_while_getting_books_list_with_title_fragment_nonexistent_in_db() throws Exception {
+        //when
+        when(bookService.findByTitleFragment("python")).thenThrow(ResourceNotFoundException.class);
+
+        //then
+        mockMvc.perform(get("/v1/library/books/title/{titleFragment}", "python").accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isNotFound());
+
+        verify(bookService, times(1)).findByTitleFragment(anyString());
+        verifyNoMoreInteractions(bookService);
+    }
+
+    @Test
     public void should_get_book_by_publication_year() throws Exception {
         //given
         final Book Spring5EnEd = Book.builder().id(6L).title("Spring in Action, Fifth Edition").isbn("9781617294945")

@@ -48,6 +48,25 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    public List<Book> findByTitleFragment(String titleFragment) throws ResourceNotFoundException {
+        LOG.info("BookServiceImpl.findByTitleFragment: finding the book with its title containing {} provided it exists.", titleFragment);
+
+        List<Book> bookList = bookRepository.findByTitleIgnoringCaseContainingOrderById(titleFragment);
+
+        if (bookList == null) {
+            LOG.info("BookServiceImpl.findByTitleFragment: there is null instead of the list with books containing {} in their titles.", titleFragment);
+            throw new ResourceNotFoundException("BookServiceImpl.findByTitleFragment: found no book satisfying given condition.");
+        }
+
+        if (bookList.size() == 0) {
+            LOG.info("BookServiceImpl.findByTitleFragment: the list with books containing {} in their titles is empty.", titleFragment);
+            throw new ResourceNotFoundException("BookServiceImpl.findByTitleFragment: found no book satisfying given condition.");
+        }
+
+        return bookList;
+    }
+
+    @Override
     public List<Book> findByPublicationYear(String publicationYear) throws ResourceNotFoundException, WrongDataProvidedException {
 
         if (!Pattern.compile("^[\\d]{1,4}$").matcher(publicationYear).find())
