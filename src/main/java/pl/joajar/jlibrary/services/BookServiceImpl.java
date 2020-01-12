@@ -67,6 +67,32 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    public List<Book> findByIsbnFragment(String isbnFragment) throws ResourceNotFoundException, WrongDataProvidedException {
+
+/*        if (isbnFragment == null)
+            throw new ResourceNotFoundException("BookServiceImpl.findByIsbnFragment: found no book satisfying given condition.");*/
+
+        if (!Pattern.compile("^[\\d]{1,13}$").matcher(isbnFragment).find())
+            throw new WrongDataProvidedException("BookServiceImpl.findByIsbnFragment: wrong isbn fragment given.");
+
+        LOG.info("BookServiceImpl.findByIsbnFragment: finding the book with its isbn containing {} provided it exists.", isbnFragment);
+
+        List<Book> bookList = bookRepository.findByIsbnContaining(isbnFragment);
+
+        if (bookList == null) {
+            LOG.info("BookServiceImpl.findByIsbnFragment: there is null instead of the list with books containing {} in their isbn.", isbnFragment);
+            throw new ResourceNotFoundException("BookServiceImpl.findByIsbnFragment: found no book satisfying given condition.");
+        }
+
+        if (bookList.size() == 0) {
+            LOG.info("BookServiceImpl.findByIsbnFragment: the list with books containing {} in their isbn is empty.", isbnFragment);
+            throw new ResourceNotFoundException("BookServiceImpl.findByIsbnFragment: found no book satisfying given condition.");
+        }
+
+        return bookList;
+    }
+
+    @Override
     public List<Book> findByPublicationYear(String publicationYear) throws ResourceNotFoundException, WrongDataProvidedException {
 
         if (!Pattern.compile("^[\\d]{1,4}$").matcher(publicationYear).find())

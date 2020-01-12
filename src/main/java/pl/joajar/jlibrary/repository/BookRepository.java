@@ -11,5 +11,7 @@ import java.util.List;
 public interface BookRepository extends JpaRepository<Book, Long> {
     List<Book> findByTitleIgnoringCaseContainingOrderById(String titleFragment);
 
+    List<Book> findByIsbnContaining(String isbn);
+
     List<Book> findByPublicationDateBetweenOrderById(LocalDate lowerBound, LocalDate upperBound);
 }

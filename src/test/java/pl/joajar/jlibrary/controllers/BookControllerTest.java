@@ -123,6 +123,56 @@ public class BookControllerTest {
     }
 
     @Test
+    public void should_get_book_by_isbn_fragment() throws Exception {
+        //given
+        final Book Java1 = Book.builder().id(1L).title("Java. Podstawy. Wydanie X").publicationDate(LocalDate.of(2016, 9, 26))
+                .isbn("9788328324800").build();
+
+        //when
+        when(bookService.findByIsbnFragment("00")).thenReturn(Collections.singletonList(Java1));
+
+        //then
+        mockMvc.perform(get("/v1/library/books/isbn/{isbnFragment}", "00").accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].id").exists())
+                .andExpect(jsonPath("$[0].id").value(Matchers.is(1)))
+                .andExpect(jsonPath("$[0].title").value(Matchers.is("Java. Podstawy. Wydanie X")))
+                .andExpect(jsonPath("$[0].isbn").value(Matchers.is("9788328324800")))
+        ;
+
+        verify(bookService, times(1)).findByIsbnFragment(anyString());
+        verifyNoMoreInteractions(bookService);
+    }
+
+    @Test
+    public void should_fail_while_getting_books_list_with_isbn_nonnumerical_fragment() throws Exception {
+        //when
+        when(bookService.findByIsbnFragment("python")).thenThrow(WrongDataProvidedException.class);
+
+        //then
+        mockMvc.perform(get("/v1/library/books/isbn/{isbnFragment}", "python").accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isNotAcceptable());
+
+        verify(bookService, times(1)).findByIsbnFragment(anyString());
+        verifyNoMoreInteractions(bookService);
+    }
+
+    @Test
+    public void should_fail_while_getting_books_list_with_isbn_numerical_fragment_nonexistent_in_db() throws Exception {
+        //when
+        when(bookService.findByIsbnFragment("0000")).thenThrow(ResourceNotFoundException.class);
+
+        //then
+        mockMvc.perform(get("/v1/library/books/isbn/{isbnFragment}", "0000").accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isNotFound());
+
+        verify(bookService, times(1)).findByIsbnFragment(anyString());
+        verifyNoMoreInteractions(bookService);
+    }
+
+    @Test
     public void should_get_book_by_publication_year() throws Exception {
         //given
         final Book Spring5EnEd = Book.builder().id(6L).title("Spring in Action, Fifth Edition").isbn("9781617294945")

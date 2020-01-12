@@ -39,6 +39,12 @@ public class BookController {
         return new ResponseEntity<>(bookService.findByTitleFragment(titleFragment), HttpStatus.OK);
     }
 
+    @GetMapping(value = "/isbn/{isbnFragment}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Book>> getBookByIsbnFragment(@PathVariable("isbnFragment") String isbnFragment) {
+        LOG.info("BookController.getBookByIsbnFragment: finding books with its isbn containing {} provided it exists any.", isbnFragment);
+        return new ResponseEntity<>(bookService.findByIsbnFragment(isbnFragment), HttpStatus.OK);
+    }
+
     @GetMapping(value = "/publicationyear/{publicationYear}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Book>> getBookByPublicationYear(@PathVariable("publicationYear") String publicationYear) {
         LOG.info("BookController.getBookByPublicationYear: finding books published in year {}.", publicationYear);
